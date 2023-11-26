@@ -163,6 +163,3 @@ cython_debug/
 log/
 chrome_driver/
 .venv/
-input/AutomatedTicketCottonOn.properties
-input/Release.properties
-input/Upload.properties
