@@ -1,0 +1,15 @@
+B=print
+import os as A,zipfile as G,requests as H
+E='automation_tool'
+I=A.path.join(A.path.expanduser('~'),E)
+def C():
+	if A.path.exists(I):B('Already containing the source code');return
+	J=f"https://github.com/HuyGiaMsk/automation-tool/archive/main.zip";B('Start download source');F=H.get(J)
+	if F.status_code==200:
+		C=A.path.expanduser('~');D=A.path.join(C,'automated_task.zip')
+		with open(D,'wb')as K:K.write(F.content)
+		B('Download source successfully')
+		with G.ZipFile(D,'r')as L:L.extractall(C)
+		A.rename(A.path.join(C,'automation-tool-main'),A.path.join(C,E));A.remove(D);B(f"Extracted source code and placed it in {C}")
+	else:B('Failed to download the source')
+if __name__=='__main__':C()

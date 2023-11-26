@@ -1,0 +1,5 @@
+certifi==2023.7.22
+openpyxl==3.1.2
+requests==2.28.2
+selenium==4.14.0
+wget==3.2
