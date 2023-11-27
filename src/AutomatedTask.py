@@ -94,8 +94,8 @@ class AutomatedTask:
             "download.default_directory": r'{}'.format(download_path),
             "download.prompt_for_download": False,
             "download.directory_upgrade": True,
-            "excludeSwitches": ['enable-logging']
-        }
+            "excludeSwitches": ['enable-logging'],
+             }
         if not self._use_gui:
             prefs['plugins.always_open_pdf_externally'] = True
 

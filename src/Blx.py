@@ -4,37 +4,26 @@ import time
 from datetime import datetime, timedelta
 from logging import Logger
 
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait
 
 from src.AutomatedTask import AutomatedTask
 from src.Constants import ZIP_EXTENSION
 from src.FileUtil import get_excel_data_in_column_start_at_row, extract_zip, \
     check_parent_folder_contain_all_required_sub_folders, remove_all_in_folder
-from src.ResourceLock import ResourceLock
+
 from src.StringUtil import join_set_of_elements
 from src.ThreadLocalLogger import get_current_logger
 
-from enum import Enum
-
-
-# Define an enumeration class
-class BookingToInfoIndex(Enum):
-    SO_INDEX_IN_TUPLE = 0
-    BECODE_INDEX_IN_TUPLE = 1
-
-
 class Blx(AutomatedTask):
-    booking_to_info = {}
 
     def __init__(self, settings: dict[str, str]):
         super().__init__(settings)
 
     def mandatory_settings(self) -> set[str]:
         mandatory_keys: set[str] = {'username', 'password', 'excel.path', 'excel.sheet',
-                                    'excel.read_column.start_cell.bill', 'download.path',}
+                                    'download.path',
+                                    'excel.read_column.start_cell.bill'}
         return mandatory_keys
 
     def automate(self) -> None:
@@ -48,40 +37,19 @@ class Blx(AutomatedTask):
         logger.info('Try to login')
         self.__login()
         logger.info("Login successfully")
-        logger.info("Navigate to overview page the first time")
-
 
         bills: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
-                                                                       self._settings['excel.sheet'],
-                                                                       self._settings[
-                                                                           'excel.read_column.start_cell.bill'])
+                                                                self._settings['excel.sheet'],
+                                                                self._settings['excel.read_column.start_cell.bill'])
 
-        # becodes: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
-        #                                                            self._settings['excel.sheet'],
-        #                                                            self._settings[
-        #                                                                'excel.read_column.start_cell.becode'])
-        #
-        # so_numbers: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
-        #                                                               self._settings['excel.sheet'],
-        #                                                               self._settings['excel.read_column.start_cell.so'])
         if len(bills) == 0:
             logger.error('Input booking id list is empty ! Please check again')
 
-        # if len(bills) != len(becodes) or len(booking_ids) != len(becodes):
-        #     raise Exception("Please check your input data length of becode, sonumber and booking are not equal")
-
-
-        # # info means becode and so number
-        # index: int = 0
-        # for bill in bills:
-        #     self.booking_to_info[booking] = (so_numbers[index], becodes[index])
-        #     index += 1
-
-        last_booking: str = ''
+        last_bill: str = ''
         for bill in bills:
-            logger.info("Processing bill : " + bill)
+            logger.info("Processing booking : " + bill)
             self.__navigate_and_download(bill)
-            last_booking = bill
+            last_bill = bill
 
         self._driver.close()
         logger.info(
@@ -107,45 +75,48 @@ class Blx(AutomatedTask):
     def __check_up_all_downloads(self, booking_ids: set[str]) -> None:
         logger: Logger = get_current_logger()
         time.sleep(10 * self._timingFactor)
-        is_all_contained, successful_bookings, unsuccessful_bookings = check_parent_folder_contain_all_required_sub_folders(
+        is_all_contained, successful_bills, unsuccessful_bills = check_parent_folder_contain_all_required_sub_folders(
             parent_folder=self._download_folder, required_sub_folders=booking_ids)
 
         logger.info('{} successful booking folders containing documents has been download'
-                    .format(len(successful_bookings)))
-        successful_bookings = join_set_of_elements(successful_bookings, " ")
-        logger.info(successful_bookings)
+                    .format(len(successful_bills)))
+        successful_bills = join_set_of_elements(successful_bills, " ")
+        logger.info(successful_bills)
 
         if not is_all_contained:
             logger.error('{} fail attempts for downloading documents in all these bookings'
-                         .format(len(unsuccessful_bookings)))
-            successful_bookings = join_set_of_elements(unsuccessful_bookings, " ")
-            logger.info(successful_bookings)
+                         .format(len(unsuccessful_bills)))
+            successful_bills = join_set_of_elements(unsuccessful_bills, " ")
+            logger.info(successful_bills)
 
     def __navigate_and_download(self, bill: str) -> None:
         logger: Logger = get_current_logger()
-        search_box: WebElement = self._type_when_element_present(by=By.CSS_SELECTOR,
-                                                                 value='div.fm.fm-html input[type=text]',
-                                                                 content=bill)
+        self._type_when_element_present(by=By.CSS_SELECTOR, value='div.fm.fm-html input[type=text]', content=bill)
+        # click find button
+        self._click_when_element_present(by=By.CSS_SELECTOR, value='button.gwt-Button')
+        # click download
 
-        # click detail booking
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='div.content.clear button[type=button]')
-        # click tab document
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='div.entry h3.ti a')
-        time.sleep(1)
+        try:
+            self._click_when_element_present(by=By.CSS_SELECTOR, value='div.entries div:nth-child(2) h3.ti a')
+            logger.info('get bill revised')
+            full_file_path: str = os.path.join(self._download_folder, "{}_REVISED.zip".format(bill))
 
-        full_file_path: str = os.path.join(self._download_folder, bill + ZIP_EXTENSION)
+        except:
+            self._click_when_element_present(by=By.CSS_SELECTOR, value='div.entries div:nth-child(1) h3.ti a')
+            logger.info('get bill not revised')
+            full_file_path: str = os.path.join(self._download_folder, bill + ZIP_EXTENSION)
+
         self._wait_download_file_complete(full_file_path)
         extract_zip_task = threading.Thread(target=extract_zip,
                                             args=(full_file_path, self._download_folder,
                                                   self.delete_redundant_opening_pdf_files,
                                                   None),
                                             daemon=False)
-
         extract_zip_task.start()
+
         # click to back to the overview Booking page
-        self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR,
-                                                    value='#loc li.loc-place a.gwt-InlineHyperlink')
-        logger.info("Navigating back to overview page")
+        self._driver.get('https://apll.get-traction.com/')
+        logger.info("Navigating back to overview Booking page")
 
     @staticmethod
     def delete_redundant_opening_pdf_files(download_folder: str) -> None:
