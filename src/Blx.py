@@ -1,11 +1,13 @@
 import os
 import threading
 import time
+from _ast import excepthandler
 from datetime import datetime, timedelta
 from logging import Logger
 
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 
 from src.AutomatedTask import AutomatedTask
 from src.Constants import ZIP_EXTENSION
@@ -94,15 +96,13 @@ class Blx(AutomatedTask):
         self._type_when_element_present(by=By.CSS_SELECTOR, value='div.fm.fm-html input[type=text]', content=bill)
         # click find button
         self._click_when_element_present(by=By.CSS_SELECTOR, value='button.gwt-Button')
+
         # click download
-
         try:
-            self._click_when_element_present(by=By.CSS_SELECTOR, value='div.entries div:nth-child(2) h3.ti a')
-            logger.info('get bill revised')
+            self._click_when_element_present(by=By.LINK_TEXT, value='{}_REVISED.zip'.format(bill), time_wait=5)
             full_file_path: str = os.path.join(self._download_folder, "{}_REVISED.zip".format(bill))
-
         except:
-            self._click_when_element_present(by=By.CSS_SELECTOR, value='div.entries div:nth-child(1) h3.ti a')
+            self._click_when_element_present(by=By.LINK_TEXT, value='{}.zip'.format(bill))
             logger.info('get bill not revised')
             full_file_path: str = os.path.join(self._download_folder, bill + ZIP_EXTENSION)
 

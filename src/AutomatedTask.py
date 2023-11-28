@@ -95,7 +95,8 @@ class AutomatedTask:
             "download.prompt_for_download": False,
             "download.directory_upgrade": True,
             "excludeSwitches": ['enable-logging'],
-             }
+            "safebrowsing.enabled": False
+        }
         if not self._use_gui:
             prefs['plugins.always_open_pdf_externally'] = True
 
@@ -173,33 +174,33 @@ class AutomatedTask:
                 time.sleep(1 * self._timingFactor)
                 current_attempt = current_attempt + 1
 
-    def _type_when_element_present(self, by: str, value: str, content: str, time_sleep: int = 1) -> WebElement:
+    def _type_when_element_present(self, by: str, value: str, content: str, time_sleep: int = 1, time_wait=10) -> WebElement:
         web_element: WebElement = self._get_element_satisfy_predicate(by,
                                                                       value,
                                                                       expected_conditions.presence_of_element_located(
                                                                           (by, value)),
-                                                                      time_sleep)
+                                                                      time_sleep, time_wait)
 
         web_element.send_keys(content)
         return web_element
 
-    def _click_when_element_present(self, by: str, value: str, time_sleep: int = 1) -> WebElement:
+    def _click_when_element_present(self, by: str, value: str, time_sleep: int = 1, time_wait=10) -> WebElement:
         web_element: WebElement = self._get_element_satisfy_predicate(by,
                                                                       value,
                                                                       expected_conditions.presence_of_element_located(
                                                                           (by, value)),
-                                                                      time_sleep)
+                                                                      time_sleep, time_wait)
 
         web_element.click()
         return web_element
 
-    def _click_and_wait_navigate_to_other_page(self, by: str, value: str, time_sleep: int = 1) -> WebElement:
+    def _click_and_wait_navigate_to_other_page(self, by: str, value: str, time_sleep: int = 1, time_wait=10) -> WebElement:
         previous_url: str = self._driver.current_url
         web_element: WebElement = self._get_element_satisfy_predicate(by,
                                                                       value,
                                                                       expected_conditions.presence_of_element_located(
                                                                           (by, value)),
-                                                                      time_sleep)
+                                                                      time_sleep, time_wait)
         web_element.click()
         self._wait_navigating_to_other_page_complete(previous_url=previous_url)
         return web_element
@@ -208,9 +209,9 @@ class AutomatedTask:
                                        by: str,
                                        element_selector: str,
                                        method: Callable[[AnyDriver], WebElement],
-                                       time_sleep: int = 1) -> WebElement:
+                                       time_sleep: int = 1,
+                                       time_wait: int = 10) -> WebElement:
         time.sleep(time_sleep * self._timingFactor)
-        if self._use_gui:
-            WebDriverWait(self._driver, 150 * self._timingFactor).until(method)
+        WebDriverWait(self._driver, time_wait * self._timingFactor).until(method)
         queried_element: WebElement = self._driver.find_element(by=by, value=element_selector)
         return queried_element
