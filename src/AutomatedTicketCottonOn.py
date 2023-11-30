@@ -159,8 +159,7 @@ class AutomatedTicketCottonOn(AutomatedTask):
 
         # click detail booking
         self._click_when_element_present(by=By.CSS_SELECTOR, value='td[data-cy=table-cell-actions] '
-                                                                   'div[data-cy=action-details]'
-                                                                   ':nth-child(2)')
+                                                                   'div[data-cy=action-details] ')
         # click tab document
         self._click_when_element_present(by=By.CSS_SELECTOR, value='button[data-cy=documents]')
         time.sleep(1)

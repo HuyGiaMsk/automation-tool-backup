@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import messagebox
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.remote import webelement
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions
 
@@ -92,9 +93,8 @@ class Upload(AutomatedTask):
 
         for becode, so_number in becode_to_sonumber.items():
             self._upload(becode, so_number)
-            # self._proceed_new_tab(becode, so_number)
+
         logger.info("Complete Upload")
-        # messagebox.showinfo('Edoc Upload','Hi Uyen - Complete Upload')
 
         self._driver.close()
         logger.info(
@@ -142,12 +142,12 @@ class Upload(AutomatedTask):
         logger.info('Go to next page successfully')
 
         self._click_when_element_present(by=By.CSS_SELECTOR, value='#template #row0 td:nth-child(6) input',
-                                         time_sleep=2)
+                                         time_wait=1)
         logger.info('clicked so box')
 
         # self._type_when_element_present(by=By.CSS_SELECTOR, value='#moreOptionUpload button', value='#moreOptionUpload button')
         # this code is use like formal code below:
-        upload_button: WebElement = self._get_element_satisfy_predicate(by=By.CSS_SELECTOR, time_sleep=2,
+        upload_button: WebElement = self._get_element_satisfy_predicate(by=By.CSS_SELECTOR,
                                                                         element_selector='#moreOptionUpload button',
                                                                         method=expected_conditions.presence_of_element_located(
                                                                             (By.CSS_SELECTOR,
@@ -168,34 +168,32 @@ class Upload(AutomatedTask):
 
         # switched tab 2
 
-
         # INV upload
-        # options_inv: list[str] = self._driver.find_element("#row0 td:nth-child(1)")
-        # for option_inv in options_inv:
-        #     innerText = option_inv.get_attribute('innerHTML')
-        #     if innerText.contains('Commercial Invoice'):
-        #         self._click_when_element_present(by=By.CSS_SELECTOR, value=option_inv)
-        #         return option_inv
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='#row0 td:nth-child(1) option:nth-child(7)')
+        suitable_option_inv: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                              list_options_selector='#row0 td:nth-child(1) option',
+                                                              search_keyword='Commercial Invoice')
+        suitable_option_inv.click()
+
         invoice_path: str = os.path.join(self._document_folder, so_number, '{}_INV.pdf'.format(so_number))
         if not os.path.exists(invoice_path):
             raise Exception('Can not find out the file {}'.format(invoice_path))
+
         self._type_when_element_present(by=By.CSS_SELECTOR, value='#row0 input[type=file]', content=invoice_path)
 
         # PL upload
-        # options_pkls: list[str] = self._driver.find_element("#row1 td:nth-child(1)")
-        # for options_pkl in options_pkls:
-        #     innerText = options_pkl.get_attribute('innerHTML')
-        #     if innerText.contains('Packing List'):
-        #         self._click_when_element_present(by=By.CSS_SELECTOR, value=options_pkl)
-        #         return options_pkl
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='#row1 td:nth-child(1) option:nth-child(23)')
+        suitable_option_pkl: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                                 list_options_selector='#row1 td:nth-child(1) option',
+                                                                 search_keyword='Packing List')
+        suitable_option_pkl.click()
+
         packing_list_path: str = os.path.join(self._document_folder, so_number, '{}_PKL.pdf'.format(so_number))
         if not os.path.exists(packing_list_path):
             raise Exception('Can not find out the file {}'.format(packing_list_path))
 
-        self._type_when_element_present(by=By.CSS_SELECTOR, value='#row1 input[type=file]', content=packing_list_path)
+        self._type_when_element_present(by=By.CSS_SELECTOR, value='#row1 input[type=file]',
+                                        content=packing_list_path)
 
+        # click submit button
         self._type_when_element_present(by=By.CSS_SELECTOR, value='input.buttongap1.update',
                                         content=Keys.CONTROL + Keys.ENTER)
         logger.info('Confirmed upload')

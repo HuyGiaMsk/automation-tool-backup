@@ -215,3 +215,16 @@ class AutomatedTask:
         WebDriverWait(self._driver, time_wait * self._timingFactor).until(method)
         queried_element: WebElement = self._driver.find_element(by=by, value=element_selector)
         return queried_element
+
+    def find_matched_option(self: object, by: str, list_options_selector: str, search_keyword: str) -> WebElement:
+        options: list[WebElement] = self._driver.find_elements(by=by, value=list_options_selector)
+        finding_option = None
+        for current_option in options:
+            current_inner_text = current_option.get_attribute('innerHTML')
+            if search_keyword in current_inner_text:
+                finding_option = current_option
+                break
+        if finding_option is None:
+            raise Exception('Can not find out the option whose inner text match your search keyword')
+        return finding_option
+
