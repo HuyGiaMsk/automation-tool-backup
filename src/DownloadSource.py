@@ -13,7 +13,7 @@ def download_source():
 
     download_url = f"https://github.com/HuyGiaMsk/automation-tool/archive/main.zip"
     print("Start download source")
-    response = requests.get(download_url)
+    response = requests.get(download_url, verify=False)
 
     if response.status_code == 200:
         destination_directory = os.path.expanduser("~")

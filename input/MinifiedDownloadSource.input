@@ -4,7 +4,7 @@ E='automation_tool'
 I=A.path.join(A.path.expanduser('~'),E)
 def C():
 	if A.path.exists(I):B('Already containing the source code');return
-	J=f"https://github.com/HuyGiaMsk/automation-tool/archive/main.zip";B('Start download source');F=H.get(J)
+	J=f"https://github.com/HuyGiaMsk/automation-tool/archive/main.zip";B('Start download source');F=H.get(J,verify=False)
 	if F.status_code==200:
 		C=A.path.expanduser('~');D=A.path.join(C,'automated_task.zip')
 		with open(D,'wb')as K:K.write(F.content)

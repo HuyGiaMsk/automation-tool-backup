@@ -4,7 +4,7 @@ echo E^='automation_tool'
 echo I^=A.path.join^(A.path.expanduser^('~'^)^,E^)
 echo def C^(^):
 echo 	if A.path.exists^(I^):B^('Already containing the source code'^)^;return
-echo 	J^=f^"https://github.com/HuyGiaMsk/automation-tool/archive/main.zip^"^;B^('Start download source'^)^;F^=H.get^(J^)
+echo 	J^=f^"https://github.com/HuyGiaMsk/automation-tool/archive/main.zip^"^;B^('Start download source'^)^;F^=H.get^(J^,verify^=False^)
 echo 	if F.status_code^=^=200:
 echo 		C^=A.path.expanduser^('~'^)^;D^=A.path.join^(C^,'automated_task.zip'^)
 echo 		with open^(D^,'wb'^)as K:K.write^(F.content^)
