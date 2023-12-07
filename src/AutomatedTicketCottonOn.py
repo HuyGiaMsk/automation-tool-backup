@@ -159,22 +159,24 @@ class AutomatedTicketCottonOn(AutomatedTask):
 
         # click detail booking
         self._click_when_element_present(by=By.CSS_SELECTOR, value='td[data-cy=table-cell-actions] '
-                                                                   'div[data-cy=action-details] ')
+                                                                   'div[data-cy=action-details] ',
+                                         time_wait=2)
         # click tab document
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='button[data-cy=documents]')
+        self._click_when_element_present(by=By.CSS_SELECTOR, value='button[data-cy=documents]', time_wait=2)
         time.sleep(1)
         # click view file
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='div[data-cy=shipment-documents-box] '
-                                                                   '.MuiGrid-container '
-                                                                   '.MuiGrid-item:nth-child(6) button')
+        # self._click_when_element_present(by=By.CSS_SELECTOR, value='div[data-cy=shipment-documents-box] '
+        #                                                            '.MuiGrid-container '
+        #                                                            '.MuiGrid-item:nth-child(6) button',
+        #                                  time_wait=2)
 
         # wait until the progress bar on view file disappear
         time.sleep(1 * self._timingFactor)
-        WebDriverWait(self._driver, 120 * self._timingFactor).until(ec.invisibility_of_element(
-            (By.CSS_SELECTOR, 'div[data-cy=shipment-documents-box] .MuiGrid-container '
-                              '.MuiGrid-item:nth-child(6) button .progressbar')))
-
-        self._wait_to_close_all_new_tabs_except_the_current()
+        # WebDriverWait(self._driver, 120 * self._timingFactor).until(ec.invisibility_of_element(
+        #     (By.CSS_SELECTOR, 'div[data-cy=shipment-documents-box] .MuiGrid-container '
+        #                       '.MuiGrid-item:nth-child(6) button .progressbar')))
+        #
+        # self._wait_to_close_all_new_tabs_except_the_current()
 
         # click downLoad all files
         self._click_when_element_present(by=By.CSS_SELECTOR, value='div[data-cy=shipment-documents-box] '
