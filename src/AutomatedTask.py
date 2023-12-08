@@ -220,8 +220,8 @@ class AutomatedTask:
         options: list[WebElement] = self._driver.find_elements(by=by, value=list_options_selector)
         finding_option = None
         for current_option in options:
-            current_inner_text = current_option.get_attribute('innerHTML')
-            if search_keyword in current_inner_text:
+            current_inner_text = current_option.get_attribute('innerText')
+            if current_inner_text in search_keyword:
                 finding_option = current_option
                 break
         if finding_option is None:

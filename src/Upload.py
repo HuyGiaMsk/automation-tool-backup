@@ -184,14 +184,52 @@ class Upload(AutomatedTask):
         suitable_option_pkl: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
                                                                  list_options_selector='#row1 td:nth-child(1) option',
                                                                  search_keyword='Packing List')
-        suitable_option_pkl.click()
 
+        suitable_option_pkl.click()
         packing_list_path: str = os.path.join(self._document_folder, so_number, '{}_PKL.pdf'.format(so_number))
+
         if not os.path.exists(packing_list_path):
             raise Exception('Can not find out the file {}'.format(packing_list_path))
-
         self._type_when_element_present(by=By.CSS_SELECTOR, value='#row1 input[type=file]',
                                         content=packing_list_path)
+
+        # Bill upload
+        suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                                   list_options_selector='#row2 td:nth-child(1) option',
+                                                                   search_keyword='Bill of Lading')
+        suitable_option_bill.click()
+
+        bill_path: str = os.path.join(self._document_folder, so_number, '{}_BL.pdf'.format(so_number))
+        if not os.path.exists(bill_path):
+            raise Exception('Can not find out the file {}'.format(bill_path))
+        self._type_when_element_present(by=By.CSS_SELECTOR, value='#row2 input[type=file]',
+                                        content=bill_path)
+
+        # FCR upload
+        suitable_option_fcr: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                                   list_options_selector='#row3 td:nth-child(1) option',
+                                                                   search_keyword='Forwarders Cargo Receipt')
+        suitable_option_fcr.click()
+
+        fcr_path: str = os.path.join(self._document_folder, so_number, '{}_FCR.pdf'.format(so_number))
+        if not os.path.exists(fcr_path):
+            raise Exception('Can not find out the file {}'.format(fcr_path))
+
+        self._type_when_element_present(by=By.CSS_SELECTOR, value='#row3 input[type=file]',
+                                        content=fcr_path)
+
+        # HSWB upload
+        suitable_option_hswb: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                                   list_options_selector='#row4 td:nth-child(1) option',
+                                                                   search_keyword='House Sea Way Bill')
+        suitable_option_hswb.click()
+
+        hswb_path: str = os.path.join(self._document_folder, so_number, '{}_HSWB.pdf'.format(so_number))
+        if not os.path.exists(fcr_path):
+            raise Exception('Can not find out the file {}'.format(hswb_path))
+
+        self._type_when_element_present(by=By.CSS_SELECTOR, value='#row4 input[type=file]',
+                                        content=hswb_path)
 
         # click submit button
         self._type_when_element_present(by=By.CSS_SELECTOR, value='input.buttongap1.update',
