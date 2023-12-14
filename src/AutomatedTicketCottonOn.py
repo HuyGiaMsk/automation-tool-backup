@@ -25,7 +25,6 @@ class BookingToInfoIndex(Enum):
     SO_INDEX_IN_TUPLE = 0
     BECODE_INDEX_IN_TUPLE = 1
 
-
 class AutomatedTicketCottonOn(AutomatedTask):
     booking_to_info = {}
 
@@ -52,7 +51,7 @@ class AutomatedTicketCottonOn(AutomatedTask):
 
         logger.info("Navigate to overview Booking page the first time")
         # click navigating operations on header
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='div[data-cy=nav-Operations]')
+        self._click_when_element_present(by=By.CSS_SELECTOR, value='div[data-cy=nav-Operations]', time_wait=2)
         # click navigating overview bookings page - on the header
         self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR, value='li[data-cy=bookings]')
 
@@ -94,8 +93,9 @@ class AutomatedTicketCottonOn(AutomatedTask):
         logger.info("Summary info about list of successful and unsuccessful attempts to download each "
                     "booking's documents during the program")
 
+
         # Display summary info to the user
-        self.__check_up_all_downloads(set(booking_ids))
+        # self.__check_up_all_downloads(set(booking_ids))
 
         # Pause and wait for the user to press Enter
         logger.info("It ends at {}. Press any key to end program...".format(datetime.now()))
@@ -108,22 +108,22 @@ class AutomatedTicketCottonOn(AutomatedTask):
         self._type_when_element_present(by=By.ID, value='pwd', content=password)
         self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR, value='button[type=submit]')
 
-    def __check_up_all_downloads(self, booking_ids: set[str]) -> None:
-        logger: Logger = get_current_logger()
-        time.sleep(10 * self._timingFactor)
-        is_all_contained, successful_bookings, unsuccessful_bookings = check_parent_folder_contain_all_required_sub_folders(
-            parent_folder=self._download_folder, required_sub_folders=booking_ids)
-
-        logger.info('{} successful booking folders containing documents has been download'
-                    .format(len(successful_bookings)))
-        successful_bookings = join_set_of_elements(successful_bookings, " ")
-        logger.info(successful_bookings)
-
-        if not is_all_contained:
-            logger.error('{} fail attempts for downloading documents in all these bookings'
-                         .format(len(unsuccessful_bookings)))
-            successful_bookings = join_set_of_elements(unsuccessful_bookings, " ")
-            logger.info(successful_bookings)
+    # def __check_up_all_downloads(self, booking_ids: set[str]) -> None:
+    #     logger: Logger = get_current_logger()
+    #     time.sleep(10 * self._timingFactor)
+    #     is_all_contained, successful_bookings, unsuccessful_bookings = check_parent_folder_contain_all_required_sub_folders(
+    #         parent_folder=self._download_folder, required_sub_folders=booking_ids)
+    #
+    #     logger.info('{} successful booking folders containing documents has been download'
+    #                 .format(len(successful_bookings)))
+    #     successful_bookings = join_set_of_elements(successful_bookings, " ")
+    #     logger.info(successful_bookings)
+    #
+    #     if not is_all_contained:
+    #         logger.error('{} fail attempts for downloading documents in all these bookings'
+    #                      .format(len(unsuccessful_bookings)))
+    #         successful_bookings = join_set_of_elements(unsuccessful_bookings, " ")
+    #         logger.info(successful_bookings)
 
     def __navigate_and_download(self, booking: str) -> None:
         logger: Logger = get_current_logger()
@@ -163,7 +163,7 @@ class AutomatedTicketCottonOn(AutomatedTask):
                                          time_wait=2)
         # click tab document
         self._click_when_element_present(by=By.CSS_SELECTOR, value='button[data-cy=documents]', time_wait=2)
-        time.sleep(1)
+        # time.sleep(1)
         # click view file
         # self._click_when_element_present(by=By.CSS_SELECTOR, value='div[data-cy=shipment-documents-box] '
         #                                                            '.MuiGrid-container '
@@ -172,11 +172,6 @@ class AutomatedTicketCottonOn(AutomatedTask):
 
         # wait until the progress bar on view file disappear
         time.sleep(1 * self._timingFactor)
-        # WebDriverWait(self._driver, 120 * self._timingFactor).until(ec.invisibility_of_element(
-        #     (By.CSS_SELECTOR, 'div[data-cy=shipment-documents-box] .MuiGrid-container '
-        #                       '.MuiGrid-item:nth-child(6) button .progressbar')))
-        #
-        # self._wait_to_close_all_new_tabs_except_the_current()
 
         # click downLoad all files
         self._click_when_element_present(by=By.CSS_SELECTOR, value='div[data-cy=shipment-documents-box] '

@@ -194,16 +194,29 @@ class Upload(AutomatedTask):
                                         content=packing_list_path)
 
         # Bill upload
-        suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
-                                                                   list_options_selector='#row2 td:nth-child(1) option',
-                                                                   search_keyword='Bill of Lading')
-        suitable_option_bill.click()
+        try_count_upload: int = 0
+        try:
+            if try_count_upload > 1:
+                raise Exception('This SO has CBL')
+            house_bill_path: str = os.path.join(self._document_folder, so_number, '{}_HBL.pdf'.format(so_number))
 
-        bill_path: str = os.path.join(self._document_folder, so_number, '{}_BL.pdf'.format(so_number))
-        if not os.path.exists(bill_path):
-            raise Exception('Can not find out the file {}'.format(bill_path))
-        self._type_when_element_present(by=By.CSS_SELECTOR, value='#row2 input[type=file]',
-                                        content=bill_path)
+            suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                                        list_options_selector='#row2 td:nth-child(1) option',
+                                                                        search_keyword='House Sea Way Bill')
+            suitable_option_bill.click()
+            self._type_when_element_present(by=By.CSS_SELECTOR, value='#row2 input[type=file]',
+                                            content=house_bill_path)
+            try_count_upload += 1
+
+        except Exception:
+            carrier_bill_path: str = os.path.join(self._document_folder, so_number, '{}_CBL.pdf'.format(so_number))
+
+            suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                                        list_options_selector='#row2 td:nth-child(1) option',
+                                                                        search_keyword='Bill of Lading')
+            suitable_option_bill.click()
+            self._type_when_element_present(by=By.CSS_SELECTOR, value='#row2 input[type=file]',
+                                            content=carrier_bill_path)
 
         # FCR upload
         suitable_option_fcr: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
@@ -217,19 +230,6 @@ class Upload(AutomatedTask):
 
         self._type_when_element_present(by=By.CSS_SELECTOR, value='#row3 input[type=file]',
                                         content=fcr_path)
-
-        # HSWB upload
-        suitable_option_hswb: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
-                                                                   list_options_selector='#row4 td:nth-child(1) option',
-                                                                   search_keyword='House Sea Way Bill')
-        suitable_option_hswb.click()
-
-        hswb_path: str = os.path.join(self._document_folder, so_number, '{}_HSWB.pdf'.format(so_number))
-        if not os.path.exists(fcr_path):
-            raise Exception('Can not find out the file {}'.format(hswb_path))
-
-        self._type_when_element_present(by=By.CSS_SELECTOR, value='#row4 input[type=file]',
-                                        content=hswb_path)
 
         # click submit button
         self._type_when_element_present(by=By.CSS_SELECTOR, value='input.buttongap1.update',
