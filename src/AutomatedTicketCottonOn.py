@@ -106,7 +106,7 @@ class AutomatedTicketCottonOn(AutomatedTask):
 
         self._type_when_element_present(by=By.ID, value='user-mail', content=username)
         self._type_when_element_present(by=By.ID, value='pwd', content=password)
-        self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR, value='button[type=submit]')
+        self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR, value='button[type=submit]', time_wait=10)
 
     # def __check_up_all_downloads(self, booking_ids: set[str]) -> None:
     #     logger: Logger = get_current_logger()
