@@ -167,69 +167,66 @@ class Upload(AutomatedTask):
         logger.info('switched to new tab')
 
         # switched tab 2
+        folder_upload = os.path.join(self._download_folder, so_number)
+        file_name_inv: str = '_INV'
+        file_name_pkl: str = '_PKL'
+        file_name_hbl: str = '_HBL'
+        file_name_cbl: str = '_CBL'
+        file_name_fcr: str = '_FCR'
 
-        # INV upload
-        suitable_option_inv: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
-                                                              list_options_selector='#row0 td:nth-child(1) option',
-                                                              search_keyword='Commercial Invoice')
-        suitable_option_inv.click()
+        with ResourceLock(file_path=folder_upload):
+            row_index: int = 0
+            for file_name in os.listdir(folder_upload):
+                file_path: str = os.path.join(folder_upload, file_name)
 
-        invoice_path: str = os.path.join(self._document_folder, so_number, '{}_INV.pdf'.format(so_number))
-        if not os.path.exists(invoice_path):
-            raise Exception('Can not find out the file {}'.format(invoice_path))
+                # INV upload
+                if file_name_inv in file_name:
+                    suitable_option_inv: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                                          list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
+                                                                          search_keyword='Commercial Invoice')
+                    suitable_option_inv.click()
+                    self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index), content=file_path)
+                    row_index = row_index + 1
 
-        self._type_when_element_present(by=By.CSS_SELECTOR, value='#row0 input[type=file]', content=invoice_path)
+                # PL upload
+                if file_name_pkl in file_name:
+                    suitable_option_pkl: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                                             list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
+                                                                             search_keyword='Packing List')
+                    suitable_option_pkl.click()
+                    self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index),
+                                                    content=file_path)
+                    row_index = row_index + 1
 
-        # PL upload
-        suitable_option_pkl: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
-                                                                 list_options_selector='#row1 td:nth-child(1) option',
-                                                                 search_keyword='Packing List')
+                # House Bill upload
+                if file_name_hbl in file_name:
+                    suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                                                list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
+                                                                                search_keyword='House Sea Way Bill')
+                    suitable_option_bill.click()
+                    self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index),
+                                                    content=file_path)
+                    row_index = row_index + 1
 
-        suitable_option_pkl.click()
-        packing_list_path: str = os.path.join(self._document_folder, so_number, '{}_PKL.pdf'.format(so_number))
+                # Carrier Bill upload
+                if file_name_cbl in file_name:
+                    suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                                                list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
+                                                                                search_keyword='Bill of Lading')
+                    suitable_option_bill.click()
+                    self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index),
+                                                    content=file_path)
+                    row_index = row_index + 1
 
-        if not os.path.exists(packing_list_path):
-            raise Exception('Can not find out the file {}'.format(packing_list_path))
-        self._type_when_element_present(by=By.CSS_SELECTOR, value='#row1 input[type=file]',
-                                        content=packing_list_path)
-
-        # Bill upload
-        try_count_upload: int = 0
-        try:
-            if try_count_upload > 1:
-                raise Exception('This SO has CBL')
-            house_bill_path: str = os.path.join(self._document_folder, so_number, '{}_HBL.pdf'.format(so_number))
-
-            suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
-                                                                        list_options_selector='#row2 td:nth-child(1) option',
-                                                                        search_keyword='House Sea Way Bill')
-            suitable_option_bill.click()
-            self._type_when_element_present(by=By.CSS_SELECTOR, value='#row2 input[type=file]',
-                                            content=house_bill_path)
-            try_count_upload += 1
-
-        except Exception:
-            carrier_bill_path: str = os.path.join(self._document_folder, so_number, '{}_CBL.pdf'.format(so_number))
-
-            suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
-                                                                        list_options_selector='#row2 td:nth-child(1) option',
-                                                                        search_keyword='Bill of Lading')
-            suitable_option_bill.click()
-            self._type_when_element_present(by=By.CSS_SELECTOR, value='#row2 input[type=file]',
-                                            content=carrier_bill_path)
-
-        # FCR upload
-        suitable_option_fcr: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
-                                                                   list_options_selector='#row3 td:nth-child(1) option',
-                                                                   search_keyword='Forwarders Cargo Receipt')
-        suitable_option_fcr.click()
-
-        fcr_path: str = os.path.join(self._document_folder, so_number, '{}_FCR.pdf'.format(so_number))
-        if not os.path.exists(fcr_path):
-            raise Exception('Can not find out the file {}'.format(fcr_path))
-
-        self._type_when_element_present(by=By.CSS_SELECTOR, value='#row3 input[type=file]',
-                                        content=fcr_path)
+                # FCR upload
+                if file_name_fcr in file_name:
+                    suitable_option_fcr: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                                                                               list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
+                                                                               search_keyword='Forwarders Cargo Receipt')
+                    suitable_option_fcr.click()
+                    self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index),
+                                                    content=file_path)
+                    row_index = row_index + 1
 
         # click submit button
         self._type_when_element_present(by=By.CSS_SELECTOR, value='input.buttongap1.update',
