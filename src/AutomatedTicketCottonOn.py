@@ -4,6 +4,7 @@ import time
 from datetime import datetime, timedelta
 from logging import Logger
 
+from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as ec
@@ -106,24 +107,25 @@ class AutomatedTicketCottonOn(AutomatedTask):
 
         self._type_when_element_present(by=By.ID, value='user-mail', content=username)
         self._type_when_element_present(by=By.ID, value='pwd', content=password)
+        time.sleep(2)
         self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR, value='button[type=submit]', time_wait=10)
 
     # def __check_up_all_downloads(self, booking_ids: set[str]) -> None:
-    #     logger: Logger = get_current_logger()
-    #     time.sleep(10 * self._timingFactor)
-    #     is_all_contained, successful_bookings, unsuccessful_bookings = check_parent_folder_contain_all_required_sub_folders(
-    #         parent_folder=self._download_folder, required_sub_folders=booking_ids)
+    #      logger: Logger = get_current_logger()
+    #      time.sleep(10 * self._timingFactor)
+    #      is_all_contained, successful_bookings, unsuccessful_bookings = check_parent_folder_contain_all_required_sub_folders(
+    #          parent_folder=self._download_folder, required_sub_folders=booking_ids)
     #
-    #     logger.info('{} successful booking folders containing documents has been download'
-    #                 .format(len(successful_bookings)))
-    #     successful_bookings = join_set_of_elements(successful_bookings, " ")
-    #     logger.info(successful_bookings)
+    #      logger.info('{} successful booking folders containing documents has been download'
+    #                  .format(len(successful_bookings)))
+    #      successful_bookings = join_set_of_elements(successful_bookings, " ")
+    #      logger.info(successful_bookings)
     #
-    #     if not is_all_contained:
-    #         logger.error('{} fail attempts for downloading documents in all these bookings'
-    #                      .format(len(unsuccessful_bookings)))
-    #         successful_bookings = join_set_of_elements(unsuccessful_bookings, " ")
-    #         logger.info(successful_bookings)
+    #      if not is_all_contained:
+    #          logger.error('{} fail attempts for downloading documents in all these bookings'
+    #                       .format(len(unsuccessful_bookings)))
+    #          successful_bookings = join_set_of_elements(unsuccessful_bookings, " ")
+    #          logger.info(successful_bookings)
 
     def __navigate_and_download(self, booking: str) -> None:
         logger: Logger = get_current_logger()
@@ -162,13 +164,7 @@ class AutomatedTicketCottonOn(AutomatedTask):
                                                                    'div[data-cy=action-details] ',
                                          time_wait=2)
         # click tab document
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='button[data-cy=documents]', time_wait=2)
-        # time.sleep(1)
-        # click view file
-        # self._click_when_element_present(by=By.CSS_SELECTOR, value='div[data-cy=shipment-documents-box] '
-        #                                                            '.MuiGrid-container '
-        #                                                            '.MuiGrid-item:nth-child(6) button',
-        #                                  time_wait=2)
+        self._click_when_element_present(by=By.ID, value='item-documents')
 
         # wait until the progress bar on view file disappear
         time.sleep(1 * self._timingFactor)
@@ -187,8 +183,9 @@ class AutomatedTicketCottonOn(AutomatedTask):
 
         extract_zip_task.start()
         # click to back to the overview Booking page
-        self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR,
-                                                    value='.MuiBreadcrumbs-ol .MuiBreadcrumbs-li:nth-child(1)')
+        self._click_when_element_present(by=By.CSS_SELECTOR, value='button[data-cy=iconButtonClose] '
+                                                                   'span.MuiIconButton-label svg')
+        self._click_when_element_present(by=By.CSS_SELECTOR, value='div[role=button] svg', time_wait=2)
         logger.info("Navigating back to overview Booking page")
 
     @staticmethod
