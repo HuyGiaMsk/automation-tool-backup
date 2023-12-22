@@ -73,7 +73,6 @@ class Blx(AutomatedTask):
         self._type_when_element_present(by=By.ID, value='username', content=username)
         self._type_when_element_present(by=By.ID, value='password', content=password)
         self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR, value='input[type=button]')
-
     def __check_up_all_downloads(self, booking_ids: set[str]) -> None:
         logger: Logger = get_current_logger()
         time.sleep(10 * self._timingFactor)
