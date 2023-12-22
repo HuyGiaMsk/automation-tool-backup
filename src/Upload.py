@@ -82,17 +82,17 @@ class Upload(AutomatedTask):
                                                                       self._settings['excel.read_column.start_cell.so'])
         becode_to_sonumber: dict[str, str] = {}
 
-        if not len(becodes) == len(so_numbers):
+        if not len(so_numbers) == len(becodes):
             raise Exception('be_codes and so_numbers do not have thhe same length')
 
         # Processign to upload
         index = 0
-        for becode in becodes:
-            becode_to_sonumber[becode] = so_numbers[index]
+        for so_number in so_numbers:
+            becode_to_sonumber[so_number] = becodes[index]
             index += 1
 
-        for becode, so_number in becode_to_sonumber.items():
-            self._upload(becode, so_number)
+        for so_number, becode in becode_to_sonumber.items():
+            self._upload(so_number, becode)
 
         logger.info("Complete Upload")
 
@@ -108,7 +108,7 @@ class Upload(AutomatedTask):
         self._type_when_element_present(by=By.ID, value='ctl00_ContentPlaceHolder1_PasswordTextBox', content=password)
         self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR, value='input[type=submit]')
 
-    def _upload(self, becode: str, so_number: str):
+    def _upload(self, so_number: str, becode: str):
         logger: Logger = get_current_logger()
 
         self._click_when_element_present(by=By.ID, value='selectedClientId_chosen')
