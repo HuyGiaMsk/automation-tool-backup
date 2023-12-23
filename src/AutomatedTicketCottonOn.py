@@ -110,23 +110,6 @@ class AutomatedTicketCottonOn(AutomatedTask):
         time.sleep(2)
         self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR, value='button[type=submit]', time_wait=10)
 
-    # def __check_up_all_downloads(self, booking_ids: set[str]) -> None:
-    #      logger: Logger = get_current_logger()
-    #      time.sleep(10 * self._timingFactor)
-    #      is_all_contained, successful_bookings, unsuccessful_bookings = check_parent_folder_contain_all_required_sub_folders(
-    #          parent_folder=self._download_folder, required_sub_folders=booking_ids)
-    #
-    #      logger.info('{} successful booking folders containing documents has been download'
-    #                  .format(len(successful_bookings)))
-    #      successful_bookings = join_set_of_elements(successful_bookings, " ")
-    #      logger.info(successful_bookings)
-    #
-    #      if not is_all_contained:
-    #          logger.error('{} fail attempts for downloading documents in all these bookings'
-    #                       .format(len(unsuccessful_bookings)))
-    #          successful_bookings = join_set_of_elements(unsuccessful_bookings, " ")
-    #          logger.info(successful_bookings)
-
     def __navigate_and_download(self, booking: str) -> None:
         logger: Logger = get_current_logger()
         search_box: WebElement = self._type_when_element_present(by=By.CSS_SELECTOR,

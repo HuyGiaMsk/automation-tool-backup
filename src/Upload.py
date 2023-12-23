@@ -202,7 +202,7 @@ class Upload(AutomatedTask):
                 if file_name_hbl in file_name:
                     suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
                                                                                 list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
-                                                                                search_keyword='House Sea Way Bill')
+                                                                                search_keyword='House Bill of Lading')
                     suitable_option_bill.click()
                     self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index),
                                                     content=file_path)
