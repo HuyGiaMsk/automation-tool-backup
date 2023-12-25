@@ -13,9 +13,9 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.expected_conditions import AnyDriver
 from selenium.webdriver.support.wait import WebDriverWait
 
-from src.DownloadDriver import place_suitable_chromedriver, get_full_browser_driver_path
-from src.StringUtil import validate_keys_of_dictionary
-from src.ThreadLocalLogger import get_current_logger, create_thread_local_logger
+from src.common.DownloadDriver import place_suitable_chromedriver, get_full_browser_driver_path
+from src.common.StringUtil import validate_keys_of_dictionary
+from src.common.ThreadLocalLogger import get_current_logger, create_thread_local_logger
 
 
 class AutomatedTask:

@@ -1,21 +1,18 @@
 import os
 import threading
 import time
-from _ast import excepthandler
 from datetime import datetime, timedelta
 from logging import Logger
 
-from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 
-from src.AutomatedTask import AutomatedTask
+from src.task.AutomatedTask import AutomatedTask
 from src.Constants import ZIP_EXTENSION
-from src.FileUtil import get_excel_data_in_column_start_at_row, extract_zip, \
+from src.common.FileUtil import get_excel_data_in_column_start_at_row, extract_zip, \
     check_parent_folder_contain_all_required_sub_folders, remove_all_in_folder
 
-from src.StringUtil import join_set_of_elements
-from src.ThreadLocalLogger import get_current_logger
+from src.common.StringUtil import join_set_of_elements
+from src.common.ThreadLocalLogger import get_current_logger
 
 class Blx(AutomatedTask):
 

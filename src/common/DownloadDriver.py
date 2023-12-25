@@ -6,9 +6,9 @@ import wget
 import re
 
 from logging import Logger
-from src.FileUtil import remove_all_in_folder
+from src.common.FileUtil import remove_all_in_folder
 from src.Constants import PATH_TO_DRIVER, PREFIX_DRIVER_NAME, DRIVER_EXTENSION
-from src.ThreadLocalLogger import get_current_logger
+from src.common.ThreadLocalLogger import get_current_logger
 
 
 def get_latest_version_from_google(base_number_version: str) -> str:

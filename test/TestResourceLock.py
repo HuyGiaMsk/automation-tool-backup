@@ -3,8 +3,8 @@ import threading
 from logging import Logger
 
 from src.Constants import ROOT_DIR
-from src.ResourceLock import ResourceLock
-from src.ThreadLocalLogger import get_current_logger
+from src.common.ResourceLock import ResourceLock
+from src.common.ThreadLocalLogger import get_current_logger
 
 if __name__ == "__main__":
     path = os.path.join(ROOT_DIR, 'output', 'temp_file.txt')

@@ -16,7 +16,7 @@ for /d %%D in ("%USERPROFILE%\*") do (
 )
 
 :set_main_paths
-set SOURCE_PATH=%USERPROFILE%\%OneDriveFolder%\automation_tool
+set SOURCE_PATH=%USERPROFILE%\automation_tool
 
 :download_source_code
     echo --------------------------------------------------------------------------------------------------------------

@@ -11,8 +11,8 @@ from logging import Logger
 from openpyxl.cell.cell import Cell
 from openpyxl.workbook.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from src.ThreadLocalLogger import get_current_logger
-from src.ResourceLock import ResourceLock
+from src.common.ThreadLocalLogger import get_current_logger
+from src.common.ResourceLock import ResourceLock
 
 def load_key_value_from_file_properties(setting_file: str) -> dict[str, str]:
     logger: Logger = get_current_logger()

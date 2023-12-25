@@ -1,7 +1,7 @@
 import os
 
 from src.Constants import ROOT_DIR
-from src.StringUtil import escape_bat_file_special_chars
+from src.common.StringUtil import escape_bat_file_special_chars
 
 
 def escape_special_chars_to_embedded_python_to_bat():

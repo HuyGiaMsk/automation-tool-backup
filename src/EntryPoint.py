@@ -1,15 +1,27 @@
 import os
 import threading
 import importlib
+import pkgutil
 from logging import Logger
 from threading import Thread
 from types import ModuleType
 
-from src.StringUtil import validate_keys_of_dictionary
+from src.common.StringUtil import validate_keys_of_dictionary
 from src.Constants import ROOT_DIR
-from src.AutomatedTask import AutomatedTask
-from src.ThreadLocalLogger import get_current_logger
-from src.FileUtil import load_key_value_from_file_properties
+from src.task.AutomatedTask import AutomatedTask
+from src.common.ThreadLocalLogger import get_current_logger
+from src.common.FileUtil import load_key_value_from_file_properties
+
+
+def find_class(class_name):
+    for importer, modname, ispkg in pkgutil.iter_modules():
+        try:
+            module = importlib.import_module(modname)
+            if hasattr(module, class_name):
+                return getattr(module, class_name)
+        except ImportError:
+            pass
+    raise ImportError(f"Class '{class_name}' not found in any module.")
 
 
 if __name__ == "__main__":
@@ -28,13 +40,13 @@ if __name__ == "__main__":
 
         clazz_module: ModuleType = importlib.import_module('src.' + invoked_class)
         clazz = getattr(clazz_module, invoked_class)
+        # clazz = find_class(invoked_class)
 
         setting_file = os.path.join(ROOT_DIR, 'input', '{}.properties'.format(invoked_class))
         settings: dict[str, str] = load_key_value_from_file_properties(setting_file)
         settings['invoked_class'] = invoked_class
 
         automated_task: AutomatedTask = clazz(settings)
-
         if run_sequentially:
             automated_task.perform()
             continue

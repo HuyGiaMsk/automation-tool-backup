@@ -2,7 +2,7 @@ import time
 import errno
 import os
 
-from src.ThreadLocalLogger import get_current_logger
+from src.common.ThreadLocalLogger import get_current_logger
 
 
 class ResourceLockException(Exception):

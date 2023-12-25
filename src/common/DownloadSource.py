@@ -1,6 +1,5 @@
 import os
 import zipfile
-
 import requests
 
 SOURCE_FOLDER_NAME: str = 'automation_tool'

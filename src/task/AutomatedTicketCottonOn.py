@@ -4,19 +4,15 @@ import time
 from datetime import datetime, timedelta
 from logging import Logger
 
-from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait
 
-from src.AutomatedTask import AutomatedTask
+from src.task.AutomatedTask import AutomatedTask
 from src.Constants import ZIP_EXTENSION
-from src.FileUtil import get_excel_data_in_column_start_at_row, extract_zip, \
-    check_parent_folder_contain_all_required_sub_folders, remove_all_in_folder
-from src.ResourceLock import ResourceLock
-from src.StringUtil import join_set_of_elements
-from src.ThreadLocalLogger import get_current_logger
+from src.common.FileUtil import get_excel_data_in_column_start_at_row, extract_zip, \
+    remove_all_in_folder
+from src.common.ResourceLock import ResourceLock
+from src.common.ThreadLocalLogger import get_current_logger
 
 from enum import Enum
 

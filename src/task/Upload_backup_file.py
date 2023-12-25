@@ -1,18 +1,15 @@
 import os
 import time
 from logging import Logger
-import tkinter as tk
-from tkinter import messagebox
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.remote import webelement
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions
 
-from src.AutomatedTask import AutomatedTask
-from src.FileUtil import get_excel_data_in_column_start_at_row
-from src.ThreadLocalLogger import get_current_logger
-from src.ResourceLock import ResourceLock
+from src.task.AutomatedTask import AutomatedTask
+from src.common.FileUtil import get_excel_data_in_column_start_at_row
+from src.common.ThreadLocalLogger import get_current_logger
+from src.common.ResourceLock import ResourceLock
 
 
 class Upload_backup_file(AutomatedTask):
