@@ -44,7 +44,7 @@ class Upload(AutomatedTask):
         try_attempt_count: int = 0
         while True:
             try:
-                if try_attempt_count > 20:
+                if try_attempt_count > 50:
                     raise Exception('Look like we have problems with the web structure changed - '
                                     'we could not click on the option_booking ! Need to our investigation')
                 iframe = self._driver.find_element(by=By.ID, value='applicationIframe')

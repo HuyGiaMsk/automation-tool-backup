@@ -11,7 +11,6 @@ from src.common.XlwingProvider import XlwingProvider
 from src.task.AutomatedTask import AutomatedTask
 from src.common.ThreadLocalLogger import get_current_logger
 
-
 class PDFRead(AutomatedTask):
 
     def mandatory_settings(self) -> set[str]:
@@ -25,13 +24,13 @@ class PDFRead(AutomatedTask):
 
         path_to_excel_contain_pdfs_content = self._settings['excel.path']
         workbook = excel_reader.get_workbook(path=path_to_excel_contain_pdfs_content)
+        logger.info('Loading excel files')
 
         sheet_name: str = self._settings['excel.sheet']
         # self.delete_and_create_new_sheet(work_book=workbook,
         #                                  sheet_name=sheet_name,
         #                                  path_to_excel=path_to_excel_contain_pdfs_content)
         worksheet = excel_reader.get_worksheet(workbook, sheet_name)
-        # worksheet = workbook[]
 
         path_to_docs = self._settings['path_to_folder_docs']
         pdf_counter: int = 1
@@ -39,7 +38,6 @@ class PDFRead(AutomatedTask):
         for root, dirs, files in os.walk(path_to_docs):
 
             for current_pdf in files:
-
                 if not current_pdf.lower().endswith(".pdf"):
                     continue
 
@@ -62,17 +60,15 @@ class PDFRead(AutomatedTask):
                 # filename=path_to_excel_contain_pdfs_content
                 pdf_counter += 1
 
-
-
         excel_reader.close(workbook=workbook)
-    # @staticmethod
-    # def delete_and_create_new_sheet(work_book: Workbook, sheet_name: str, path_to_excel: str) -> None:
-    #     if sheet_name in work_book.sheetnames:
-    #         sheet_to_delete = work_book[sheet_name]
-    #         work_book.remove(sheet_to_delete)
-    #
-    #     work_book.create_sheet(sheet_name)
-    #     work_book.save(path_to_excel)
+        # @staticmethod
+        # def delete_and_create_new_sheet(work_book: Workbook, sheet_name: str, path_to_excel: str) -> None:
+        #     if sheet_name in work_book.sheetnames:
+        #         sheet_to_delete = work_book[sheet_name]
+        #         work_book.remove(sheet_to_delete)
+        #
+        #     work_book.create_sheet(sheet_name)
+        #     work_book.save(path_to_excel)
 if __name__ == '__main__':
     invoked_class = 'PDFRead'
     setting_file = os.path.join(ROOT_DIR, 'input', '{}.properties'.format(invoked_class))
