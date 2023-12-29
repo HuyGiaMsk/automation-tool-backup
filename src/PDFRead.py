@@ -14,7 +14,7 @@ from src.common.ThreadLocalLogger import get_current_logger
 class PDFRead(AutomatedTask):
 
     def mandatory_settings(self) -> set[str]:
-        mandatory_keys: set[str] = {'excel.path', 'excel.sheet', 'path_to_folder_docs', 'path_to_folder_error'}
+        mandatory_keys: set[str] = {'excel.path', 'excel.sheet', 'path_to_folder_docs'}
         return mandatory_keys
 
     def automate(self):
@@ -32,7 +32,6 @@ class PDFRead(AutomatedTask):
         worksheet.delete_contents(worksheet=worksheet, start_cell='A1', end_cell='AZ200')
 
         path_to_docs = self._settings['path_to_folder_docs']
-        path_to_error = self._settings['path_to_folder_error']
         pdf_counter: int = 1
 
         for root, dirs, files in os.walk(path_to_docs):
