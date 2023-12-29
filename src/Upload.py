@@ -197,16 +197,17 @@ class Upload(AutomatedTask):
 
                 # House Bill upload
                 if file_name_hbl in file_name:
-                    suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
+                    suitable_option_house_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
                                                                                 list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
                                                                                 search_keyword='House Bill of Lading')
-                    suitable_option_bill.click()
+                    suitable_option_house_bill.click()
                     self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index),
                                                     content=file_path)
                     row_index = row_index + 1
 
                 # Carrier Bill upload
                 if file_name_cbl in file_name:
+
                     suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
                                                                                 list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
                                                                                 search_keyword='Bill of Lading')

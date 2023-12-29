@@ -1,9 +1,8 @@
 import os
-from logging import Logger
-
 import pdfplumber
-from pdfplumber import PDF
 
+from pdfplumber import PDF
+from logging import Logger
 from src.Constants import ROOT_DIR
 from src.common import ExcelReaderProvider
 from src.common.FileUtil import load_key_value_from_file_properties
@@ -11,10 +10,11 @@ from src.common.XlwingProvider import XlwingProvider
 from src.task.AutomatedTask import AutomatedTask
 from src.common.ThreadLocalLogger import get_current_logger
 
+
 class PDFRead(AutomatedTask):
 
     def mandatory_settings(self) -> set[str]:
-        mandatory_keys: set[str] = {'excel.path', 'excel.sheet', 'path_to_folder_docs'}
+        mandatory_keys: set[str] = {'excel.path', 'excel.sheet', 'path_to_folder_docs', 'path_to_folder_error'}
         return mandatory_keys
 
     def automate(self):
@@ -27,12 +27,12 @@ class PDFRead(AutomatedTask):
         logger.info('Loading excel files')
 
         sheet_name: str = self._settings['excel.sheet']
-        # self.delete_and_create_new_sheet(work_book=workbook,
-        #                                  sheet_name=sheet_name,
-        #                                  path_to_excel=path_to_excel_contain_pdfs_content)
         worksheet = excel_reader.get_worksheet(workbook, sheet_name)
 
+        worksheet.delete_contents(worksheet=worksheet, start_cell='A1', end_cell='AZ200')
+
         path_to_docs = self._settings['path_to_folder_docs']
+        path_to_error = self._settings['path_to_folder_error']
         pdf_counter: int = 1
 
         for root, dirs, files in os.walk(path_to_docs):
@@ -42,7 +42,6 @@ class PDFRead(AutomatedTask):
                     continue
 
                 pdf: PDF = pdfplumber.open(os.path.join(root, current_pdf))
-
                 logger.info("File name : {} PDF counter  = {}".format(current_pdf, pdf_counter))
                 excel_reader.change_value_at(worksheet=worksheet, row=1, column=pdf_counter, value=current_pdf)
 
@@ -53,14 +52,16 @@ class PDFRead(AutomatedTask):
 
                     # print( "text at page {} : {}".format(current_page_in_current_pdf, clean_text))
                     for line in clean_text.splitlines():
-                        excel_reader.change_value_at(worksheet=worksheet, row=current_page_in_current_pdf, column=pdf_counter, value=line)
+                        excel_reader.change_value_at(worksheet=worksheet, row=current_page_in_current_pdf,
+                                                     column=pdf_counter, value=line)
                         current_page_in_current_pdf += 1
 
                 excel_reader.save(workbook=workbook)
-                # filename=path_to_excel_contain_pdfs_content
+
                 pdf_counter += 1
 
         excel_reader.close(workbook=workbook)
+
         # @staticmethod
         # def delete_and_create_new_sheet(work_book: Workbook, sheet_name: str, path_to_excel: str) -> None:
         #     if sheet_name in work_book.sheetnames:
@@ -69,6 +70,7 @@ class PDFRead(AutomatedTask):
         #
         #     work_book.create_sheet(sheet_name)
         #     work_book.save(path_to_excel)
+
 if __name__ == '__main__':
     invoked_class = 'PDFRead'
     setting_file = os.path.join(ROOT_DIR, 'input', '{}.properties'.format(invoked_class))
