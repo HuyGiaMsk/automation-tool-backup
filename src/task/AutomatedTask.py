@@ -1,17 +1,17 @@
-import logging
 import os
 import time
+import logging
 import uuid
-from abc import abstractmethod
-from logging import Logger
-from typing import Callable
 
+from logging import Logger
+from abc import abstractmethod
+from typing import Callable
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.expected_conditions import AnyDriver
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions
 
 from src.common.DownloadDriver import place_suitable_chromedriver, get_full_browser_driver_path
 from src.common.StringUtil import validate_keys_of_dictionary
@@ -25,51 +25,54 @@ class AutomatedTask:
         logger: Logger = get_current_logger()
         self._settings: dict[str, str] = settings
 
-        mandatory_settings = self.mandatory_settings()
-        mandatory_settings.add('invoked_class')
-        validate_keys_of_dictionary(settings, mandatory_settings)
-        self._setting = settings
-
-        self._download_folder = self._settings['download.path']
-        if os.path.isfile(self._download_folder):
-            logger.info(f"Provided download folder '{self._download_folder}'is not valid. It is a file, "
-                        f"not folder")
-            raise Exception(f"Provided download folder '{self._download_folder}'is not valid. It is a file, "
+        self._download_folder = self._settings.get('download.path')
+        if self._download_folder is not None:
+            if os.path.isfile(self._download_folder):
+                logger.info(f"Provided download folder '{self._download_folder}'is not valid. It is a file, "
                             f"not folder")
+                raise Exception(f"Provided download folder '{self._download_folder}'is not valid. It is a file, "
+                                f"not folder")
 
-        if not os.path.exists(self._download_folder):
-            os.makedirs(self._download_folder)
-            logger.info(f"Create folder '{self._download_folder}' because it is not existed by default")
+            if not os.path.exists(self._download_folder):
+                os.makedirs(self._download_folder)
+                logger.info(f"Create folder '{self._download_folder}' because it is not existed by default")
 
         if self._settings['time.unit.factor'] is None:
             self._timingFactor = 1.0
         else:
             self._timingFactor = float(self._settings['time.unit.factor'])
 
-        if self._settings['time.unit.factor'] is not None:
-            self._use_gui = 'True'.lower() == str(self._settings['use.GUI']).lower()
+        self._use_gui = False if self._settings['use.GUI'] is None else 'True'.lower() == str(self._settings['use.GUI']).lower()
 
         if not self._use_gui:
             logger.info('Run in headless mode')
-
-        browser_driver: str = get_full_browser_driver_path()
-        self._driver = self._setup_driver(browser_driver)
+        self._driver = None
 
     @abstractmethod
-    def mandatory_settings(self) -> set[str]:
+    def mandatory_settings(self) -> list[str]:
         pass
 
     @abstractmethod
     def automate(self):
         pass
 
+    @abstractmethod
+    def getCurrentPercent(self):
+        pass
+
     def perform(self):
+        mandatory_settings = self.mandatory_settings()
+        mandatory_settings.append('invoked_class')
+        validate_keys_of_dictionary(self._settings, set(mandatory_settings))
+
+        browser_driver: str = get_full_browser_driver_path()
+        self._driver = self._setup_driver(browser_driver)
         logger: Logger = create_thread_local_logger(class_name=self._settings['invoked_class'],
                                                     thread_uuid=str(uuid.uuid4()))
-        # try:
-        self.automate()
-        # except Exception as exception:
-        #     logger.info(str(exception))
+        try:
+            self.automate()
+        except Exception as exception:
+            logger.exception(str(exception))
 
     def _setup_driver(self,
                       browser_driver: str) -> WebDriver:
@@ -94,8 +97,7 @@ class AutomatedTask:
             "download.default_directory": r'{}'.format(download_path),
             "download.prompt_for_download": False,
             "download.directory_upgrade": True,
-            "excludeSwitches": ['enable-logging'],
-            "safebrowsing.enabled": False
+            "excludeSwitches": ['enable-logging']
         }
         if not self._use_gui:
             prefs['plugins.always_open_pdf_externally'] = True

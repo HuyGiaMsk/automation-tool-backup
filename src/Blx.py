@@ -19,10 +19,9 @@ class Blx(AutomatedTask):
     def __init__(self, settings: dict[str, str]):
         super().__init__(settings)
 
-    def mandatory_settings(self) -> set[str]:
-        mandatory_keys: set[str] = {'username', 'password', 'excel.path', 'excel.sheet',
-                                    'download.path',
-                                    'excel.read_column.start_cell.bill'}
+    def mandatory_settings(self) -> list[str]:
+        mandatory_keys: list[str] = ['username', 'password', 'excel.path', 'excel.sheet',
+                                    'download.path', 'excel.read_column.start_cell.bill']
         return mandatory_keys
 
     def automate(self) -> None:

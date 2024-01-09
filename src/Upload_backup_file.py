@@ -17,9 +17,9 @@ class Upload_backup_file(AutomatedTask):
         super().__init__(settings)
         self._document_folder = self._download_folder
 
-    def mandatory_settings(self) -> set[str]:
-        mandatory_keys: set[str] = {'username', 'password', 'excel.path', 'excel.sheet', 'download.path',
-                                    'excel.read_column.start_cell.so', 'excel.read_column.start_cell.becode'}
+    def mandatory_settings(self) -> list[str]:
+        mandatory_keys: list[str] = ['username', 'password', 'excel.path', 'excel.sheet', 'download.path',
+                                    'excel.read_column.start_cell.so', 'excel.read_column.start_cell.becode']
         return mandatory_keys
 
     def automate(self):
@@ -37,7 +37,7 @@ class Upload_backup_file(AutomatedTask):
             current_url: str = self._driver.current_url
             if current_url.endswith('documentmanagement/'):
                 break
-            self._click_when_element_present(by=By.CSS_SELECTOR, value='a.DOCUMENT_MANAGEMENT', time_wait=10)
+            self._click_when_element_present(by=By.CSS_SELECTOR, value='a.DOCUMENT_MANAGEMENT')
             time.sleep(2)
 
         # iframe switch before clicking CNEE BECODE, check ID or Classname

@@ -17,9 +17,9 @@ class Upload(AutomatedTask):
         super().__init__(settings)
         self._document_folder = self._download_folder
 
-    def mandatory_settings(self) -> set[str]:
-        mandatory_keys: set[str] = {'username', 'password', 'excel.path', 'excel.sheet', 'download.path',
-                                    'excel.read_column.start_cell.so', 'excel.read_column.start_cell.becode'}
+    def mandatory_settings(self) -> list[str]:
+        mandatory_keys: list[str] = ['username', 'password', 'excel.path', 'excel.sheet', 'download.path',
+                                    'excel.read_column.start_cell.so', 'excel.read_column.start_cell.becode']
         return mandatory_keys
 
     def automate(self):
@@ -138,8 +138,7 @@ class Upload(AutomatedTask):
 
         logger.info('Go to next page successfully')
 
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='#template #row0 td:nth-child(6) input',
-                                         time_wait=1)
+        self._click_when_element_present(by=By.CSS_SELECTOR, value='#template #row0 td:nth-child(6) input')
         logger.info('clicked so box')
 
         # self._type_when_element_present(by=By.CSS_SELECTOR, value='#moreOptionUpload button', value='#moreOptionUpload button')
@@ -260,4 +259,5 @@ class Upload(AutomatedTask):
         logger.info('re-switched to 1st tab')
 
         self._click_when_element_present(by=By.PARTIAL_LINK_TEXT, value='SEARCH')
+
         logger.info('Back to Homepage')

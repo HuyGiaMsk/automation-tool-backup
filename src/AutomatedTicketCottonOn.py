@@ -28,10 +28,10 @@ class AutomatedTicketCottonOn(AutomatedTask):
     def __init__(self, settings: dict[str, str]):
         super().__init__(settings)
 
-    def mandatory_settings(self) -> set[str]:
-        mandatory_keys: set[str] = {'username', 'password', 'excel.path', 'excel.sheet',
+    def mandatory_settings(self) -> list[str]:
+        mandatory_keys: list[str] = ['username', 'password', 'excel.path', 'excel.sheet',
                                     'excel.read_column.start_cell.booking', 'download.path',
-                                    'excel.read_column.start_cell.so', 'excel.read_column.start_cell.becode'}
+                                    'excel.read_column.start_cell.so', 'excel.read_column.start_cell.becode']
         return mandatory_keys
 
     def automate(self) -> None:
@@ -140,7 +140,7 @@ class AutomatedTicketCottonOn(AutomatedTask):
 
         # click detail booking
         self._click_when_element_present(by=By.CSS_SELECTOR, value='td[data-cy=table-cell-actions] '
-                                                                   'div[data-cy=action-details] ',
+                                                                   'div[data-cy=action-details] svg',
                                          time_wait=2)
         # click tab document
         self._click_when_element_present(by=By.ID, value='item-documents')
@@ -164,7 +164,7 @@ class AutomatedTicketCottonOn(AutomatedTask):
         # click to back to the overview Booking page
         self._click_when_element_present(by=By.CSS_SELECTOR, value='button[data-cy=iconButtonClose] '
                                                                    'span.MuiIconButton-label svg')
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='div[role=button] svg', time_wait=2)
+        self._click_when_element_present(by=By.CSS_SELECTOR, value='div[role=button] svg')
         logger.info("Navigating back to overview Booking page")
 
     @staticmethod

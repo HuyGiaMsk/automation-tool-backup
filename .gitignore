@@ -163,3 +163,10 @@ cython_debug/
 log/
 chrome_driver/
 .venv/
+.idea
+chrome_driver
+bill
+download
+fcr
+log
+*.pycache

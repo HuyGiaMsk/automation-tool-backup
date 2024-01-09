@@ -17,9 +17,9 @@ class Upload_remove_file(AutomatedTask):
         super().__init__(settings)
         self._document_folder = self._download_folder
 
-    def mandatory_settings(self) -> set[str]:
-        mandatory_keys: set[str] = {'username', 'password', 'excel.path', 'excel.sheet', 'download.path',
-                                    'excel.read_column.start_cell.so', 'excel.read_column.start_cell.becode'}
+    def mandatory_settings(self) -> list[str]:
+        mandatory_keys: list[str] = ['username', 'password', 'excel.path', 'excel.sheet', 'download.path',
+                                    'excel.read_column.start_cell.so', 'excel.read_column.start_cell.becode']
         return mandatory_keys
 
     def automate(self):

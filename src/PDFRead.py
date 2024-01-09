@@ -13,8 +13,8 @@ from src.common.ThreadLocalLogger import get_current_logger
 
 class PDFRead(AutomatedTask):
 
-    def mandatory_settings(self) -> set[str]:
-        mandatory_keys: set[str] = {'excel.path', 'excel.sheet', 'path_to_folder_docs'}
+    def mandatory_settings(self) -> list[str]:
+        mandatory_keys: list[str] = ['excel.path', 'excel.sheet', 'path_to_folder_docs']
         return mandatory_keys
 
     def automate(self):
