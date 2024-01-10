@@ -29,9 +29,9 @@ class AutomatedTicketCottonOn(AutomatedTask):
         super().__init__(settings)
 
     def mandatory_settings(self) -> list[str]:
-        mandatory_keys: list[str] = ['username', 'password', 'excel.path', 'excel.sheet',
-                                    'excel.read_column.start_cell.booking', 'download.path',
-                                    'excel.read_column.start_cell.so', 'excel.read_column.start_cell.becode']
+        mandatory_keys: list[str] = ['username', 'password', 'download.folder', 'excel.path', 'excel.sheet',
+                                    'excel.column.booking',
+                                    'excel.column.so', 'excel.column.becode']
         return mandatory_keys
 
     def automate(self) -> None:
@@ -48,23 +48,23 @@ class AutomatedTicketCottonOn(AutomatedTask):
 
         logger.info("Navigate to overview Booking page the first time")
         # click navigating operations on header
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='div[data-cy=nav-Operations]', time_wait=2)
+        self._click_when_element_present(by=By.CSS_SELECTOR, value='div[data-cy=nav-Operations]')
         # click navigating overview bookings page - on the header
         self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR, value='li[data-cy=bookings]')
 
         booking_ids: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
                                                                        self._settings['excel.sheet'],
                                                                        self._settings[
-                                                                           'excel.read_column.start_cell.booking'])
+                                                                           'excel.column.booking'])
 
         becodes: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
                                                                    self._settings['excel.sheet'],
                                                                    self._settings[
-                                                                       'excel.read_column.start_cell.becode'])
+                                                                       'excel.column.becode'])
 
         so_numbers: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
                                                                       self._settings['excel.sheet'],
-                                                                      self._settings['excel.read_column.start_cell.so'])
+                                                                      self._settings['excel.column.so'])
         if len(booking_ids) == 0:
             logger.error('Input booking id list is empty ! Please check again')
 
@@ -141,7 +141,7 @@ class AutomatedTicketCottonOn(AutomatedTask):
         # click detail booking
         self._click_when_element_present(by=By.CSS_SELECTOR, value='td[data-cy=table-cell-actions] '
                                                                    'div[data-cy=action-details] svg',
-                                         time_wait=2)
+                                         time_wait=5)
         # click tab document
         self._click_when_element_present(by=By.ID, value='item-documents')
 

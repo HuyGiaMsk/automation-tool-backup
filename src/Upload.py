@@ -18,8 +18,8 @@ class Upload(AutomatedTask):
         self._document_folder = self._download_folder
 
     def mandatory_settings(self) -> list[str]:
-        mandatory_keys: list[str] = ['username', 'password', 'excel.path', 'excel.sheet', 'download.path',
-                                    'excel.read_column.start_cell.so', 'excel.read_column.start_cell.becode']
+        mandatory_keys: list[str] = ['username', 'password', 'download.folder', 'excel.path', 'excel.sheet',
+                                    'excel.column.so', 'excel.column.becode']
         return mandatory_keys
 
     def automate(self):
@@ -73,10 +73,10 @@ class Upload(AutomatedTask):
         becodes: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
                                                                    self._settings['excel.sheet'],
                                                                    self._settings[
-                                                                       'excel.read_column.start_cell.becode'])
+                                                                       'excel.column.becode'])
         so_numbers: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
                                                                       self._settings['excel.sheet'],
-                                                                      self._settings['excel.read_column.start_cell.so'])
+                                                                      self._settings['excel.column.so'])
         becode_to_sonumber: dict[str, str] = {}
 
         if not len(so_numbers) == len(becodes):
@@ -101,6 +101,7 @@ class Upload(AutomatedTask):
     def __login(self) -> None:
         username: str = self._settings['username']
         password: str = self._settings['password']
+
         self._type_when_element_present(by=By.ID, value='ctl00_ContentPlaceHolder1_UsernameTextBox', content=username)
         self._type_when_element_present(by=By.ID, value='ctl00_ContentPlaceHolder1_PasswordTextBox', content=password)
         self._click_and_wait_navigate_to_other_page(by=By.CSS_SELECTOR, value='input[type=submit]')

@@ -18,8 +18,8 @@ class Upload_backup_file(AutomatedTask):
         self._document_folder = self._download_folder
 
     def mandatory_settings(self) -> list[str]:
-        mandatory_keys: list[str] = ['username', 'password', 'excel.path', 'excel.sheet', 'download.path',
-                                    'excel.read_column.start_cell.so', 'excel.read_column.start_cell.becode']
+        mandatory_keys: list[str] = ['username', 'password', 'download.folder', 'excel.path', 'excel.sheet',
+                                    'excel.column.so', 'excel.column.becode']
         return mandatory_keys
 
     def automate(self):
@@ -73,10 +73,10 @@ class Upload_backup_file(AutomatedTask):
         becodes: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
                                                                    self._settings['excel.sheet'],
                                                                    self._settings[
-                                                                       'excel.read_column.start_cell.becode'])
+                                                                       'excel.column.becode'])
         so_numbers: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
                                                                       self._settings['excel.sheet'],
-                                                                      self._settings['excel.read_column.start_cell.so'])
+                                                                      self._settings['excel.column.so'])
         sonumber_to_becode: dict[str, str] = {}
 
         if not len(so_numbers) == len(becodes):

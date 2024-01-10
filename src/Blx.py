@@ -20,8 +20,8 @@ class Blx(AutomatedTask):
         super().__init__(settings)
 
     def mandatory_settings(self) -> list[str]:
-        mandatory_keys: list[str] = ['username', 'password', 'excel.path', 'excel.sheet',
-                                    'download.path', 'excel.read_column.start_cell.bill']
+        mandatory_keys: list[str] = ['username', 'password', 'download.folder', 'excel.path', 'excel.sheet',
+                                     'excel.column.bill']
         return mandatory_keys
 
     def automate(self) -> None:
@@ -38,7 +38,7 @@ class Blx(AutomatedTask):
 
         bills: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
                                                                 self._settings['excel.sheet'],
-                                                                self._settings['excel.read_column.start_cell.bill'])
+                                                                self._settings['excel.column.bill'])
 
         if len(bills) == 0:
             logger.error('Input booking id list is empty ! Please check again')

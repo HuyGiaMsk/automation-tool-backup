@@ -25,7 +25,7 @@ class AutomatedTask:
         logger: Logger = get_current_logger()
         self._settings: dict[str, str] = settings
 
-        self._download_folder = self._settings.get('download.path')
+        self._download_folder = self._settings.get('download.folder')
         if self._download_folder is not None:
             if os.path.isfile(self._download_folder):
                 logger.info(f"Provided download folder '{self._download_folder}'is not valid. It is a file, "

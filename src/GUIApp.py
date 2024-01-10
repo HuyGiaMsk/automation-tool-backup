@@ -13,7 +13,7 @@ from src.Constants import ROOT_DIR
 from src.common.FileUtil import load_key_value_from_file_properties
 from src.common.ResourceLock import ResourceLock
 from src.common.ThreadLocalLogger import get_current_logger
-
+from PIL import ImageTk, Image
 
 class GUIApp(tk.Tk):
 
@@ -27,13 +27,16 @@ class GUIApp(tk.Tk):
         self.container_frame = tk.Frame(self)
         self.container_frame.pack()
 
-        self.myLabel = Label(self.container_frame, text='Automation Tool', font=('Maersk Headline Bold', 16), fg='#0073AB')
+
+        self.myLabel = Label(self.container_frame,
+                             text='Automation Tool',
+                             font=('Maersk Headline Bold', 16),
+                             fg='#0073AB')
         self.myLabel.pack()
 
         self.automated_tasks_dropdown = Combobox(
             master=self.container_frame,
-            state="readonly",
-        )
+            state="readonly")
         self.automated_tasks_dropdown.pack()
 
         self.content_frame = Frame(self.container_frame, width=900, height=500, bd=1, relief=tk.SOLID)
