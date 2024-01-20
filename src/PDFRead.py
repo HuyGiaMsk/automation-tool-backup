@@ -1,4 +1,6 @@
 import os
+import threading
+import pythoncom
 import pdfplumber
 
 from pdfplumber import PDF
@@ -12,12 +14,14 @@ from src.common.ThreadLocalLogger import get_current_logger
 
 
 class PDFRead(AutomatedTask):
-
+    def __init__(self, settings: dict[str, str]):
+        super().__init__(settings)
     def mandatory_settings(self) -> list[str]:
         mandatory_keys: list[str] = ['excel.path', 'excel.sheet', 'folder_docs.folder']
         return mandatory_keys
 
     def automate(self):
+
         logger: Logger = get_current_logger()
 
         excel_reader: ExcelReaderProvider = XlwingProvider()
@@ -58,8 +62,7 @@ class PDFRead(AutomatedTask):
                 excel_reader.save(workbook=workbook)
 
                 pdf_counter += 1
-
-        excel_reader.close(workbook=workbook)
+            excel_reader.close(workbook=workbook)
 
         # @staticmethod
         # def delete_and_create_new_sheet(work_book: Workbook, sheet_name: str, path_to_excel: str) -> None:
@@ -69,11 +72,3 @@ class PDFRead(AutomatedTask):
         #
         #     work_book.create_sheet(sheet_name)
         #     work_book.save(path_to_excel)
-
-if __name__ == '__main__':
-    invoked_class = 'PDFRead'
-    setting_file = os.path.join(ROOT_DIR, 'input', '{}.properties'.format(invoked_class))
-    settings: dict[str, str] = load_key_value_from_file_properties(setting_file)
-    settings['invoked_class'] = invoked_class
-    task: AutomatedTask = PDFRead(settings)
-    task.perform()

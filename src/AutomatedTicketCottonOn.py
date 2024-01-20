@@ -81,6 +81,7 @@ class AutomatedTicketCottonOn(AutomatedTask):
         for booking in booking_ids:
             logger.info("Processing booking : " + booking)
             self.__navigate_and_download(booking)
+
             last_booking = booking
 
         self._driver.close()

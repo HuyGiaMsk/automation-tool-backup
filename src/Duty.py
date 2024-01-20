@@ -24,8 +24,7 @@ class BookingToInfoIndex(Enum):
 
 
 class Duty(AutomatedTask):
-    fcr_to_file_remane = {}
-
+    fcr_to_file_rename = {}
     def __init__(self, settings: dict[str, str]):
         super().__init__(settings)
         self._document_folder = self._download_folder
