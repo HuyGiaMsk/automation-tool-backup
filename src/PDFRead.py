@@ -1,6 +1,6 @@
 import os
 import threading
-import pythoncom
+
 import pdfplumber
 
 from pdfplumber import PDF
@@ -14,8 +14,15 @@ from src.common.ThreadLocalLogger import get_current_logger
 
 
 class PDFRead(AutomatedTask):
+    def getCurrentPercent(self):
+        pass
+
+    def get_current_percent(self) -> float:
+        pass
+
     def __init__(self, settings: dict[str, str]):
         super().__init__(settings)
+
     def mandatory_settings(self) -> list[str]:
         mandatory_keys: list[str] = ['excel.path', 'excel.sheet', 'folder_docs.folder']
         return mandatory_keys

@@ -1,27 +1,34 @@
+import importlib
+import os
 import threading
 import tkinter as tk
-from tkinter import *  # Label, Frame, Text, Widget, ttk
-from tkinter import ttk
-from tkinter.ttk import Combobox
-import os
-import importlib
-from logging import Logger
-from types import ModuleType
 import tkinter.filedialog
+from logging import Logger
+from tkinter import *  # Label, Frame, Text, Widget, ttk
+from tkinter import ttk, Text
+from tkinter.ttk import Combobox
+from types import ModuleType
 
-from src.task.AutomatedTask import AutomatedTask
+from observer.EventBroker import EventBroker
+from observer.EventHandler import EventHandler
+from observer.PercentChangedEvent import PercentChangedEvent
 from src.Constants import ROOT_DIR
 from src.common.FileUtil import load_key_value_from_file_properties
 from src.common.ResourceLock import ResourceLock
-from src.common.ThreadLocalLogger import get_current_logger
+from src.common.ThreadLocalLogger import get_current_logger, setup_textbox_logger
+from src.task.AutomatedTask import AutomatedTask
 
 
-class GUIApp(tk.Tk):
+class GUIApp(tk.Tk, EventHandler):
 
     def __init__(self):
         super().__init__()
 
-        self.geometry('900x500')
+        self.protocol("WM_DELETE_WINDOW", self.handle_close_app)
+        EventBroker.get_instance().register(topic=PercentChangedEvent.event_name,
+                                            observer=self)
+
+        self.geometry('1920x1080')
         self.logger: Logger = get_current_logger()
 
         style_conner = ttk.Style()
@@ -42,28 +49,34 @@ class GUIApp(tk.Tk):
 
         self.automated_tasks_dropdown = Combobox(master=self.container_frame, state="readonly")
         self.automated_tasks_dropdown.pack()
+        self.automated_tasks_dropdown.bind("<<ComboboxSelected>>", self.on_selection_change)
 
         self.content_frame = ttk.Frame(self.container_frame, width=900, height=500, relief=tk.SOLID,
                                        style='Rounded.TFrame')
         self.content_frame.pack(padx=5, pady=5)
-
-        self.automated_tasks_dropdown.bind("<<ComboboxSelected>>", self.on_selection_change)
 
         self.populate_dropdown()
 
         self.current_input_setting_values = {}
         self.current_automated_task_name = None
 
-        def step_procssingbar():
-            self.progressbar['value'] += 100
-            self.myLabel.config(text=self.progressbar['value'])
-            task_thread = threading.Thread(target=self.perform_task)
-            task_thread.start()
-
-        self.progressbar = ttk.Progressbar(self, orient=HORIZONTAL, length=500 ,mode="determinate", maximum=100, )
+        self.progressbar = ttk.Progressbar(self.container_frame, orient=HORIZONTAL, length=500, mode="determinate",
+                                           maximum=100)
         self.progressbar.pack(pady=20)
-        my_button = Button(self, text='process', command=step_procssingbar)
-        my_button.pack(pady=20)
+
+        textbox: Text = tk.Text(self.container_frame, wrap="word", state=tk.DISABLED, width=40, height=10)
+        textbox.pack()
+        setup_textbox_logger(textbox)
+
+    def handle_close_app(self):
+        self.persist_settings_to_file()
+        self.destroy()
+
+    def handle_incoming_event(self, event: Event) -> None:
+        self.logger.info("Receive the event")
+        if isinstance(event, PercentChangedEvent):
+            self.logger.info("Update the percent bar")
+            self.progressbar['value'] = event.current_percent
 
     def populate_dropdown(self):
         input_dir: str = os.path.join(ROOT_DIR, "input")
@@ -79,9 +92,9 @@ class GUIApp(tk.Tk):
 
     def on_selection_change(self, event):
         self.persist_settings_to_file()
-        selected_task = self.automated_tasks_dropdown.get()
-        self.update_frame_content(selected_task)
-
+        selected_task: str = self.automated_tasks_dropdown.get()
+        if selected_task is not None:
+            self.update_frame_content(selected_task)
 
     def update_frame_content(self, selected_task):
         # Clear the content frame
@@ -119,18 +132,12 @@ class GUIApp(tk.Tk):
             self.create_setting_widgets(setting_frame, each_setting, index, input_setting_values)
             index += 1
 
-
         perform_button = tk.Button(self.content_frame, text='Perform', bg='#42B0D5', font=('Maersk Headline Bold', 10),
                                    activebackground='#0073AB', fg='#F7F7F7', activeforeground='#F7F7F7',
                                    command=lambda: self.perform_task(automated_task))
         perform_button.pack()
 
-        # self.task = selected_task
-        # self.cancel_button = ttk.Button(self.content_frame, text="Cancel", command=self.cancel_task)
-        # self.cancel_button.pack()
-        # self.cancel_flag = threading.Event()
-
-    def create_setting_widgets(self, setting_frame, each_setting, index, input_setting_values):
+    def create_setting_widgets(self, setting_frame, each_setting, index, input_setting_values: dict[str, str]):
         field_label = Label(master=setting_frame, text=each_setting, width=20, wraplength=150)
         field_label.special_id = each_setting
         field_label.grid(row=index, column=0, sticky='ew', padx=3, pady=3)
@@ -138,7 +145,8 @@ class GUIApp(tk.Tk):
         field_input = Text(master=setting_frame, width=30, height=1)
         field_input.grid(row=index, column=1, sticky='ew', padx=3, pady=3)
         field_input.special_id = each_setting
-        field_input.insert("1.0", input_setting_values[each_setting])
+        initial_value: str = input_setting_values.get(each_setting)
+        field_input.insert("1.0", '' if initial_value is None else initial_value)
         field_input.bind("<KeyRelease>", self.update_field_data)
 
         path_button_text = "..." if ".path" in each_setting or '.folder' in each_setting else ""
@@ -150,11 +158,9 @@ class GUIApp(tk.Tk):
             path_button.bind('<Button-1>',
                              self.update_file_data if ".path" in each_setting else self.update_folder_data)
 
-    def perform_task(self, AutomatedTask):
-
-        task_thread = threading.Thread(target=AutomatedTask.perform, daemon=False)
+    def perform_task(self, automated_task: AutomatedTask):
+        task_thread = threading.Thread(target=automated_task.perform, daemon=False)
         task_thread.start()
-        # task.perform()
 
     def find_children_by_id(self, parent: tk.Widget, special_id: str):
         childs: list[Widget] = parent.winfo_children()
@@ -226,6 +232,7 @@ class GUIApp(tk.Tk):
             with open(file_path, 'a') as file:
                 for key, value in self.current_input_setting_values.items():
                     file.write(f"{key} = {value}\n")
+        logger.info("Persist config data completely")
 
     def toggle_theme(self, container_frame):
         global is_dark_mode
@@ -239,8 +246,6 @@ class GUIApp(tk.Tk):
             app.configure(background='white')  # light theme
             container_frame.configure(style='Rounded.TFrame', background='black')
 
-    # def cancel_task(self):
-    #     self.task.cancel()
 
 if __name__ == "__main__":
     app = GUIApp()

@@ -16,6 +16,12 @@ from src.common.ThreadLocalLogger import get_current_logger
 
 class Blx(AutomatedTask):
 
+    def getCurrentPercent(self):
+        pass
+
+    def get_current_percent(self) -> float:
+        pass
+
     def __init__(self, settings: dict[str, str]):
         super().__init__(settings)
 

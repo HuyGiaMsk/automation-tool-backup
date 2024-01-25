@@ -25,7 +25,6 @@ def validate_keys_of_dictionary(settings: dict[str, str],
             logger.error(error)
         raise Exception('Invalid settings!')
 
-
 def decode_url(url: str) -> str:
     decoded: str = ""
     index: int = 0

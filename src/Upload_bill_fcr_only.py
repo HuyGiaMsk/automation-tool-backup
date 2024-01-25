@@ -12,7 +12,13 @@ from src.common.ThreadLocalLogger import get_current_logger
 from src.common.ResourceLock import ResourceLock
 
 
-class Upload_backup_file(AutomatedTask):
+class Upload_bill_fcr_only(AutomatedTask):
+    def getCurrentPercent(self):
+        pass
+
+    def get_current_percent(self) -> float:
+        pass
+
     def __init__(self, settings: dict[str, str]):
         super().__init__(settings)
         self._document_folder = self._download_folder
@@ -77,7 +83,7 @@ class Upload_backup_file(AutomatedTask):
         so_numbers: list[str] = get_excel_data_in_column_start_at_row(self._settings['excel.path'],
                                                                       self._settings['excel.sheet'],
                                                                       self._settings['excel.column.so'])
-        sonumber_to_becode: dict[str, str] = {}
+        becode_to_sonumber: dict[str, str] = {}
 
         if not len(so_numbers) == len(becodes):
             raise Exception('be_codes and so_numbers do not have thhe same length')
@@ -85,10 +91,10 @@ class Upload_backup_file(AutomatedTask):
         # Processign to upload
         index = 0
         for so_number in so_numbers:
-            sonumber_to_becode[so_number] = becodes[index]
+            becode_to_sonumber[so_number] = becodes[index]
             index += 1
 
-        for so_number, becode in sonumber_to_becode.items():
+        for so_number, becode in becode_to_sonumber.items():
             self._upload(so_number, becode)
 
         logger.info("Complete Upload")
@@ -126,7 +132,7 @@ class Upload_backup_file(AutomatedTask):
                                          value='div.chosen-drop ul.chosen-results li.active-result')
 
         # click SO Number
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='div.styled-select option[value=BL]')
+        self._click_when_element_present(by=By.CSS_SELECTOR, value='div.styled-select option[value=SO]')
 
         # input SO Number
         self._type_when_element_present(by=By.ID, value='searchForm_objectValue1', content=Keys.CONTROL + 'a')
@@ -138,7 +144,7 @@ class Upload_backup_file(AutomatedTask):
 
         logger.info('Go to next page successfully')
 
-        self._click_when_element_present(by=By.CSS_SELECTOR, value='#template #row0 td:nth-child(2) input',
+        self._click_when_element_present(by=By.CSS_SELECTOR, value='#template #row0 td:nth-child(6) input',
                                          time_wait=1)
         logger.info('clicked so box')
 
@@ -163,21 +169,13 @@ class Upload_backup_file(AutomatedTask):
         time.sleep(2)
         logger.info('switched to new tab')
 
-        # xoa dau /
-        possiton_to_delete: int = 5  # `/`
-
-        if possiton_to_delete < len(so_number) and so_number[possiton_to_delete - 1] == '/':
-            so_number = so_number[:possiton_to_delete - 1] + so_number[possiton_to_delete:]
-
         # switched tab 2
         folder_upload = os.path.join(self._download_folder, so_number)
-        file_name_inv: str = 'INV'
-        file_name_pkl: str = 'PKL'
-        file_name_hbl: str = 'HBL'
-        file_name_cbl: str = 'CBL'
-        file_name_fcr: str = 'FCR'
-        file_name_clr: str = 'CLR'
-        file_name_bill: str = 'BL'
+        file_name_inv: str = '_INV'
+        file_name_pkl: str = '_PKL'
+        file_name_hbl: str = '_HBL'
+        file_name_cbl: str = '_CBL'
+        file_name_fcr: str = '_FCR'
 
         with ResourceLock(file_path=folder_upload):
             row_index: int = 0
@@ -186,34 +184,23 @@ class Upload_backup_file(AutomatedTask):
 
                 # INV upload
                 if file_name_inv in file_name:
-                    suitable_option_inv: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
-                                                                          list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
-                                                                          search_keyword='Commercial Invoice')
-                    suitable_option_inv.click()
-                    self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index), content=file_path)
-                    row_index = row_index + 1
+                    row_index = row_index
 
                 # PL upload
                 if file_name_pkl in file_name:
-                    suitable_option_pkl: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
-                                                                             list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
-                                                                             search_keyword='Packing List')
-                    suitable_option_pkl.click()
-                    self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index),
-                                                    content=file_path)
-                    row_index = row_index + 1
+                    row_index = row_index
 
                 # House Bill upload
                 if file_name_hbl in file_name:
                     suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
                                                                                 list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
-                                                                                search_keyword='House Sea Way Bill')
+                                                                                search_keyword='House Bill of Lading')
                     suitable_option_bill.click()
                     self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index),
                                                     content=file_path)
                     row_index = row_index + 1
 
-                # Bill upload
+                # Carrier Bill upload
                 if file_name_cbl in file_name:
                     suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
                                                                                 list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
@@ -225,31 +212,12 @@ class Upload_backup_file(AutomatedTask):
 
                 # FCR upload
                 if file_name_fcr in file_name:
-                    name: str = "Forwarder's cargo receipt"
                     suitable_option_fcr: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
                                                                                list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
-                                                                               search_keyword=name)
+                                                                               search_keyword='Forwarders Cargo Receipt')
                     suitable_option_fcr.click()
                     self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index),
                                                     content=file_path)
-                    row_index = row_index + 1
-
-                # CLR upload
-                if file_name_clr in file_name:
-                    suitable_option_clr: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
-                                                                          list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
-                                                                          search_keyword='Container Load Result')
-                    suitable_option_clr.click()
-                    self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index), content=file_path)
-                    row_index = row_index + 1
-
-                # Bill upload
-                if file_name_bill in file_name:
-                    suitable_option_bill: WebElement = self.find_matched_option(by=By.CSS_SELECTOR,
-                                                                          list_options_selector='#row{} td:nth-child(1) option'.format(row_index),
-                                                                          search_keyword='Carrier Sea Waybill')
-                    suitable_option_bill.click()
-                    self._type_when_element_present(by=By.CSS_SELECTOR, value='#row{} input[type=file]'.format(row_index), content=file_path)
                     row_index = row_index + 1
 
         # click submit button

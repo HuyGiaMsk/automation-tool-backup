@@ -7,7 +7,10 @@ from logging import Logger
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
-from src.task.AutomatedTask import AutomatedTask
+from src.observer.Event import Event
+from src.observer.EventBroker import EventBroker
+from src.observer.PercentChangedEvent import PercentChangedEvent
+
 from src.Constants import ZIP_EXTENSION
 from src.common.FileUtil import get_excel_data_in_column_start_at_row, extract_zip, \
     remove_all_in_folder
@@ -16,6 +19,8 @@ from src.common.ThreadLocalLogger import get_current_logger
 
 from enum import Enum
 
+from src.task.AutomatedTask import AutomatedTask
+
 
 # Define an enumeration class
 class BookingToInfoIndex(Enum):
@@ -23,6 +28,9 @@ class BookingToInfoIndex(Enum):
     BECODE_INDEX_IN_TUPLE = 1
 
 class AutomatedTicketCottonOn(AutomatedTask):
+    def getCurrentPercent(self):
+        pass
+
     booking_to_info = {}
 
     def __init__(self, settings: dict[str, str]):
@@ -33,6 +41,12 @@ class AutomatedTicketCottonOn(AutomatedTask):
                                     'excel.column.booking',
                                     'excel.column.so', 'excel.column.becode']
         return mandatory_keys
+
+    def get_current_percent(self) -> float:
+        return self.current_element_index * 100 / self.total_element_size
+
+    def handle_incoming_event(self, event: Event) -> None:
+        pass
 
     def automate(self) -> None:
         logger: Logger = get_current_logger()
@@ -77,12 +91,16 @@ class AutomatedTicketCottonOn(AutomatedTask):
             self.booking_to_info[booking] = (so_numbers[index], becodes[index])
             index += 1
 
-        last_booking: str = ''
-        for booking in booking_ids:
+        self.total_element_size = len(self.booking_ids)
+        self.current_element_index = 0
+        for booking in self.booking_ids:
             logger.info("Processing booking : " + booking)
             self.__navigate_and_download(booking)
-
-            last_booking = booking
+            self.current_element_index += 1
+            EventBroker.get_instance().publish(topic=PercentChangedEvent.event_name,
+                                               event=PercentChangedEvent(task_name=self.__class__.__name__,
+                                                                         current_percent=self.get_current_percent()))
+            time.sleep(1)
 
         self._driver.close()
         logger.info(
@@ -141,8 +159,7 @@ class AutomatedTicketCottonOn(AutomatedTask):
 
         # click detail booking
         self._click_when_element_present(by=By.CSS_SELECTOR, value='td[data-cy=table-cell-actions] '
-                                                                   'div[data-cy=action-details] svg',
-                                         time_wait=5)
+                                                                   'div[data-cy=action-details] svg')
         # click tab document
         self._click_when_element_present(by=By.ID, value='item-documents')
 

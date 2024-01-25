@@ -4,7 +4,7 @@ import logging
 import uuid
 
 from logging import Logger
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from typing import Callable
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -12,16 +12,17 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.expected_conditions import AnyDriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-
+from src.task.Percentage import Percentage
 from src.common.DownloadDriver import place_suitable_chromedriver, get_full_browser_driver_path
 from src.common.StringUtil import validate_keys_of_dictionary
 from src.common.ThreadLocalLogger import get_current_logger, create_thread_local_logger
 
 
-class AutomatedTask:
+class AutomatedTask(Percentage, ABC):
     _setting: set[str] = None
 
     def __init__(self, settings: dict[str, str]):
+        super().__init__()
         logger: Logger = get_current_logger()
         self._settings: dict[str, str] = settings
 

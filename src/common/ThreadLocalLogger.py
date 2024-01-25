@@ -2,11 +2,16 @@ import os.path
 import logging
 import sys
 import threading
+import tkinter as tk
 
 from logging import Logger, FileHandler, StreamHandler, Formatter
 from logging.handlers import RotatingFileHandler
 from typing import TextIO
+
+# import tk
+
 from src.Constants import LOG_FOLDER
+from src.common.TextBoxLoggingHandler import TextBoxLoggingHandler
 
 thread_local_logger = threading.local()
 
@@ -57,3 +62,11 @@ def create_logger(class_name: str, thread_uuid: str, logging_console_level: int 
     created_logger.setLevel(logging.DEBUG)
 
     return created_logger
+
+def setup_textbox_logger(textbox: tk.Text):
+    thread_local_logger: Logger = get_current_logger()
+    logging_handler: TextBoxLoggingHandler = TextBoxLoggingHandler(textbox)
+    formatter: Formatter = logging.Formatter(
+        'GUI APP - %(asctime)s - %(levelname)s - %(filename)s %(funcName)s#%(lineno)d: %(message)s')
+    logging_handler.setFormatter(formatter)
+    thread_local_logger.addHandler(logging_handler)

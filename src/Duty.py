@@ -24,14 +24,21 @@ class BookingToInfoIndex(Enum):
 
 
 class Duty(AutomatedTask):
+    def getCurrentPercent(self):
+        pass
+
+    def get_current_percent(self) -> float:
+        pass
+
     fcr_to_file_rename = {}
+
     def __init__(self, settings: dict[str, str]):
         super().__init__(settings)
         self._document_folder = self._download_folder
 
     def mandatory_settings(self) -> list[str]:
         mandatory_keys: list[str] = ['username', 'password', 'download.folder', 'rename.folder', 'excel.path',
-                                    'excel.sheet', 'excel.column.fcr', 'excel.column.fcr_rename']
+                                     'excel.sheet', 'excel.column.fcr', 'excel.column.fcr_rename']
         return mandatory_keys
 
     def automate(self):
@@ -42,7 +49,7 @@ class Duty(AutomatedTask):
 
         uid: str = self._settings['username']
         psw: str = self._settings['password']
-        login_url = 'https://{}:{}@amerapps.apmoller.net/DutyDeduction/Grid.aspx?search=true'.format((uid), (psw))
+        login_url = 'https://{}:{}@amerapps-legacy.apmoller.net/DutyDeduction/'.format((uid), (psw))
         logger.info('Try to login')
         self._driver.get(login_url)
         logger.info("Login successfully")
@@ -166,7 +173,6 @@ class Duty(AutomatedTask):
 
         return download_filter_cookies, search_filter_cookies
 
-
     def _rename_file_after_download(self, fcr_code: str, fcr_index: int):
         logger: Logger = get_current_logger()
 
@@ -202,7 +208,7 @@ class Duty(AutomatedTask):
         if os.path.exists(rename_filename_path):
             os.remove(rename_filename_path)
 
-        max_attempt: int = 2*60
+        max_attempt: int = 2 * 60
         while True:
             if attempt_counter > max_attempt:
                 logger.error('The tool waiting too long to download document for {}. Please check !'.format(fcr_code))
@@ -254,7 +260,7 @@ class Duty(AutomatedTask):
             wb.save(new_file_path)
 
     # _______________________________________________________________________________________________________________
-    def _rename_by_asp(self, postfix_url:str):
+    def _rename_by_asp(self, postfix_url: str):
 
         cookie_asp_session = self._driver.get_cookie('ASP.NET_SessionId')
         if cookie_asp_session:
@@ -268,7 +274,7 @@ class Duty(AutomatedTask):
 
                 cookies_string = ';'.join([f"{cookie['name']}={cookie['value']}" for cookie in cookies])
                 headers = {'Cookie': f"NET_SessionId={asp_session_value}",
-                           'Host' : 'amerapps.apmoller.net'}
+                           'Host': 'amerapps.apmoller.net'}
 
                 session.auth = None
                 response = session.get(pdf_url, headers=headers, verify=False, auth=None)
